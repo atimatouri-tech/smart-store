@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>در حال اتصال به درگاه پرداخت - Smart Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: { DEFAULT: '#0F1012', surface: '#18191D', surface2: '#202126', border: '#2C2D33', muted: '#92949C' },
+                        paper: { DEFAULT: '#FAFAF8', surface: '#FFFFFF', surface2: '#F1F1EF', border: '#E4E4E0', ink: '#16171A', muted: '#6E7078' },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: { vazir: ['Vazirmatn', 'system-ui'], mono: ['"JetBrains Mono"', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        body { position: relative; background-color: #FAFAF8; }
+        html.dark body { background-color: #0F1012; }
+        body::before {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.949 0 0 0 0 0.663 0 0 0 0 0.231 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        body::after {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 55%, rgba(15,16,18,0.05) 100%);
+        }
+        html.dark body::after { background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 50%, rgba(0,0,0,0.35) 100%); }
+
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        /* ── spinner ── */
+        .spinner {
+            width: 64px; height: 64px;
+            border-radius: 999px;
+            border: 3px solid rgba(242,169,59,0.15);
+            border-top-color: #F2A93B;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── progress bar ── */
+        .progress-track { position: relative; overflow: hidden; }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F2A93B, #FFC469);
+            width: 0%;
+            transition: width 2.4s cubic-bezier(0.4,0,0.2,1);
+            border-radius: 999px;
+        }
+
+        .fade-up { opacity: 0; animation: fade-up 0.5s ease forwards; }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; opacity: 1; } }
+
+        .step-dot {
+            width: 8px; height: 8px; border-radius: 999px;
+            background: #E4E4E0;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        html.dark .step-dot { background: #2C2D33; }
+        .step-dot.active { background: #F2A93B; transform: scale(1.3); }
+
+        .demo-banner {
+            background: repeating-linear-gradient(135deg, rgba(242,169,59,0.08), rgba(242,169,59,0.08) 10px, rgba(242,169,59,0.14) 10px, rgba(242,169,59,0.14) 20px);
+        }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <!-- بنر پروژه آموزشی -->
+    <div class="demo-banner border-b border-amber/30 text-center py-2.5 px-4 relative z-10">
+        <p class="text-xs sm:text-sm font-bold text-amber-deep dark:text-amber">
+            <i class="fas fa-graduation-cap ml-1"></i>
+            نسخه‌ی نمایشی پروژه‌ی دانشگاهی — این یک درگاه بانکی واقعی نیست و هیچ پرداختی انجام نمی‌شود
+        </p>
+    </div>
+
+    <header class="py-6 relative z-10">
+        <div class="max-w-md mx-auto px-6 flex items-center justify-center gap-3">
+            <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+            <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-6 relative z-10">
+        <div class="max-w-md w-full text-center fade-up" style="animation-delay:.05s">
+            <div class="spinner mx-auto mb-8"></div>
+
+            <p class="eyebrow text-amber mb-2 justify-center flex">تراکنش</p>
+            <h2 id="status-text" class="text-2xl font-extrabold mb-3">در حال اتصال به درگاه پرداخت</h2>
+            <p class="text-paper-muted dark:text-graphite-muted text-sm mb-8">لطفاً صبر کنید، تا تکمیل فرآیند این صفحه را نبندید...</p>
+
+            <div class="progress-track w-full h-2 bg-paper-surface2 dark:bg-graphite-surface2 rounded-full mb-6">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+
+            <div class="flex items-center justify-center gap-2">
+                <span class="step-dot active" id="dot-1"></span>
+                <span class="step-dot" id="dot-2"></span>
+                <span class="step-dot" id="dot-3"></span>
+            </div>
+
+            <div class="mt-10 flex items-center justify-center gap-2 text-xs text-paper-muted dark:text-graphite-muted">
+                <i class="fas fa-shield-halved text-amber"></i>
+                <span>ارتباط شما رمزنگاری‌ شده و امن است</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center text-xs text-paper-muted dark:text-graphite-muted relative z-10">
+        © ۱۴۰۵ Smart Store — پروژه‌ی دانشجویی
+    </footer>
+
+    <script>
+        const steps = [
+            { text: 'در حال اتصال به درگاه پرداخت', delay: 0 },
+            { text: 'در حال بررسی اطلاعات تراکنش', delay: 1100 },
+            { text: 'در حال تایید نهایی سفارش', delay: 2000 }
+        ];
+
+        const statusText = document.getElementById('status-text');
+        const dots = [document.getElementById('dot-1'), document.getElementById('dot-2'), document.getElementById('dot-3')];
+
+        // تم تیره هماهنگ با بقیه‌ی سایت
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // شروع نوار پیشرفت
+        requestAnimationFrame(() => {
+            document.getElementById('progress-fill').style.width = '100%';
+        });
+
+        steps.forEach((step, i) => {
+            setTimeout(() => {
+                statusText.textContent = step.text;
+                dots.forEach((d, di) => d.classList.toggle('active', di <= i));
+            }, step.delay);
+        });
+
+        // انتقال خودکار به صفحه‌ی نتیجه پس از اتمام (نسخه‌ی نمایشی)
+        setTimeout(() => {
+            window.location.href = "/payment-result";
+        }, 2600);
+    </script>
+</body>
+</html>

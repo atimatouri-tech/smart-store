@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - اسمارت استور</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: {
+                            DEFAULT: '#0F1012',
+                            surface: '#18191D',
+                            surface2: '#202126',
+                            border: '#2C2D33',
+                            muted: '#92949C'
+                        },
+                        paper: {
+                            DEFAULT: '#FAFAF8',
+                            surface: '#FFFFFF',
+                            surface2: '#F1F1EF',
+                            border: '#E4E4E0',
+                            ink: '#16171A',
+                            muted: '#6E7078'
+                        },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        .thumb-btn { transition: all 0.2s ease; opacity: 0.55; }
+        .thumb-btn.active { border-color: #F2A93B; opacity: 1; }
+        .thumb-btn:hover { opacity: 1; }
+
+        .color-btn { transition: all 0.2s ease; position: relative; }
+        .color-btn.active { box-shadow: 0 0 0 2px white, 0 0 0 4px #F2A93B; transform: scale(1.08); }
+        .dark .color-btn.active { box-shadow: 0 0 0 2px #0F1012, 0 0 0 4px #F2A93B; }
+
+        .gallery-box { position: relative; }
+        .gallery-box::before, .gallery-box::after {
+            content: "";
+            position: absolute;
+            width: 18px; height: 18px;
+            border-color: #F2A93B;
+            border-style: solid;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .gallery-box::before { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+        .gallery-box::after { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+
+        #main-image { transition: opacity 0.25s ease, transform 0.4s ease; }
+        #main-image:hover { transform: scale(1.04); }
+
+        .nav-btn { transition: all 0.2s ease; }
+        .nav-btn:hover { transform: translateY(-50%) scale(1.1); background-color: #F2A93B !important; color: #0F1012; }
+
+        .buy-btn { transition: all 0.25s ease; }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(242,169,59,0.45); }
+        .buy-btn:active { transform: translateY(0); }
+
+        .price-num { font-variant-numeric: tabular-nums; }
+
+        /* ── amber glow ── */
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+        .glow-ring { box-shadow: 0 0 0 1px rgba(242,169,59,0.35), 0 0 24px -6px rgba(242,169,59,0.55); }
+
+        /* ── live pulse indicator ── */
+        .pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 999px; background: #34D399; flex-shrink: 0; }
+        .pulse-dot::after {
+            content: "";
+            position: absolute; inset: -4px;
+            border-radius: 999px;
+            border: 1.5px solid #34D399;
+            animation: pulse-ring 1.8s cubic-bezier(0.2,0.6,0.4,1) infinite;
+        }
+        @keyframes pulse-ring { 0% { transform: scale(0.7); opacity: 0.9; } 100% { transform: scale(2.1); opacity: 0; } }
+
+        /* ── staggered entrance ── */
+        .fade-up { opacity: 0; animation: fade-up 0.55s ease forwards; }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; opacity: 1; } }
+
+        /* ── custom scrollbar ── */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E4E4E0; border-radius: 999px; border: 2px solid #FAFAF8; }
+        html.dark ::-webkit-scrollbar-thumb { background: #2C2D33; border: 2px solid #0F1012; }
+        ::-webkit-scrollbar-thumb:hover { background: #F2A93B; }
+        html { scrollbar-width: thin; scrollbar-color: #E4E4E0 transparent; }
+        html.dark { scrollbar-color: #2C2D33 transparent; }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <header class="sticky top-0 bg-paper/95 dark:bg-graphite/95 backdrop-blur-md z-50 border-b border-paper-border dark:border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+                <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+            </div>
+
+            <div class="flex-1 hidden sm:block">
+                <input type="text" placeholder="جستجوی محصول..." class="w-full bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-lg py-3 px-5 text-sm">
+            </div>
+
+            <div class="flex items-center gap-4 text-lg">
+                <button onclick="toggleDarkMode()" class="p-3 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 transition-colors">
+                    <span id="theme-icon">🌙</span>
+                </button>
+                <a href="/" class="p-3 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2">
+                    <i class="fas fa-home"></i>
+                </a>
+                <a href="/cart" class="relative p-3 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-amber text-graphite text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-6 pt-6 text-sm text-paper-muted dark:text-graphite-muted flex items-center gap-2">
+        <a href="/" class="hover:text-amber">خانه</a>
+        <i class="fas fa-chevron-left text-xs"></i>
+        <span class="text-paper-ink dark:text-ink line-clamp-1">{{ product.name }}</span>
+    </div>
+
+    <main class="flex-1 max-w-6xl mx-auto px-6 py-6 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+            <div class="fade-up" style="animation-delay:.02s">
+                <div class="gallery-box glow-ring relative rounded-xl border border-paper-border dark:border-graphite-border bg-paper-surface2 dark:bg-graphite-surface2 overflow-hidden aspect-square flex items-center justify-center">
+                    {% if product.discount %}
+                    <span class="absolute top-5 right-5 z-10 bg-amber text-graphite text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg">{{ product.discount }}% تخفیف</span>
+                    {% endif %}
+
+                    {% if product.images|length > 1 %}
+                    <button onclick="changeImage(-1)" class="nav-btn absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-paper-surface/90 dark:bg-graphite-surface/90 border border-paper-border dark:border-graphite-border shadow-lg flex items-center justify-center z-10">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    {% endif %}
+
+                    <img id="main-image" src="{{ product.images[0] }}" alt="{{ product.name }}"
+                         class="max-w-full max-h-full object-contain p-10 cursor-zoom-in">
+
+                    {% if product.images|length > 1 %}
+                    <button onclick="changeImage(1)" class="nav-btn absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-paper-surface/90 dark:bg-graphite-surface/90 border border-paper-border dark:border-graphite-border shadow-lg flex items-center justify-center z-10">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% if product.images|length > 1 %}
+                <div id="dots" class="flex justify-center gap-2 mt-4"></div>
+
+                <div class="flex gap-3 mt-4 overflow-x-auto pb-1">
+                    {% for img in product.images %}
+                    <button onclick="selectImage({{ loop.index0 }})"
+                            class="thumb-btn w-16 h-16 shrink-0 rounded-lg border-2 border-paper-border dark:border-graphite-border overflow-hidden bg-paper-surface2 dark:bg-graphite-surface2 {% if loop.index0 == 0 %}active{% endif %}">
+                        <img src="{{ img }}" class="w-full h-full object-contain p-1.5">
+                    </button>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="fade-up" style="animation-delay:.08s">
+                <p class="eyebrow text-amber mb-3">{{ product.category }}</p>
+                <h1 class="text-3xl font-extrabold leading-relaxed">{{ product.name }}</h1>
+
+                <div class="flex items-center gap-2 mt-3 text-sm text-paper-muted dark:text-graphite-muted flex-wrap">
+                    <div class="flex items-center gap-1 bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border px-2.5 py-1 rounded-lg">
+                        <i class="fas fa-star text-amber"></i>
+                        <span class="font-bold text-paper-ink dark:text-ink">{{ product.rating }}</span>
+                    </div>
+                    <span>({{ product.rating_count }} امتیاز کاربران)</span>
+                    <span class="flex items-center gap-1.5 text-mint font-medium mr-1"><span class="pulse-dot"></span> موجود در انبار</span>
+                </div>
+
+                <div class="mt-7">
+                    <p class="eyebrow text-paper-muted dark:text-graphite-muted mb-3">
+                        رنگ: <span id="selected-color-name" class="text-paper-ink dark:text-ink font-bold normal-case">{{ product.colors[0].name }}</span>
+                    </p>
+                    <div class="flex gap-3">
+                        {% for c in product.colors %}
+                        <button onclick="selectColor(this, '{{ c.name }}')"
+                                class="color-btn w-10 h-10 rounded-full border border-paper-border dark:border-graphite-border {% if loop.index0 == 0 %}active{% endif %}"
+                                style="background-color: {{ c.hex }};" title="{{ c.name }}">
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="fade-up mt-8 bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-xl p-6" style="animation-delay:.14s">
+                    {% if product.old_price %}
+                    <div class="flex items-center gap-3 mb-1">
+                        <span class="text-sm bg-amber/10 text-amber-deep dark:text-amber font-bold px-2 py-1 rounded-lg">{{ product.discount }}%</span>
+                        <span class="text-sm text-paper-muted dark:text-graphite-muted line-through">{{ product.old_price }} تومان</span>
+                    </div>
+                    {% endif %}
+                    <p class="price-num text-3xl font-extrabold mono text-amber-deep dark:text-amber">{{ product.price }} <span class="text-sm font-normal text-paper-muted dark:text-graphite-muted">تومان</span></p>
+
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="addToCart()"
+                                class="buy-btn flex-1 bg-amber text-graphite py-3.5 rounded-lg font-bold hover:bg-amber-strong">
+                            افزودن به سبد خرید
+                        </button>
+                        <button onclick="toggleWishlist(this)" id="wishlist-btn"
+                                class="w-14 h-14 flex items-center justify-center rounded-lg border border-paper-border dark:border-graphite-border hover:border-red-500 transition-colors">
+                            <i class="fa-regular fa-heart text-xl text-paper-muted dark:text-graphite-muted"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {% if product.specs %}
+                <div class="mt-6 text-sm text-paper-muted dark:text-graphite-muted leading-8">
+                    {{ product.specs }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-graphite text-ink mt-auto border-t border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 text-sm">
+                <div>
+                    <p class="eyebrow text-amber mb-3">تماس</p>
+                    <h3 class="text-lg font-bold mb-4">تماس با ما</h3>
+                    <p class="flex items-center gap-2 text-graphite-muted"><i class="fas fa-phone text-amber"></i> ۰۹۳۳۷۸۴۱۴۶۲</p>
+                    <p class="flex items-center gap-2 mt-2 text-graphite-muted"><i class="fas fa-map-marker-alt text-amber"></i> تهران، میرداماد، خیابان سنجابی، پلاک ۷</p>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">شبکه‌های اجتماعی</p>
+                    <h3 class="text-lg font-bold mb-4">ما را دنبال کنید</h3>
+                    <div class="flex gap-5 text-2xl text-graphite-muted">
+                        <a href="#" class="hover:text-amber"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-amber"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">درباره</p>
+                    <h3 class="text-lg font-bold mb-2">Smart Store</h3>
+                    <p class="text-graphite-muted">فروشگاه لوازم هوشمند</p>
+                    <p class="mt-4 text-xs text-graphite-muted mono">© ۱۴۰۵ تمامی حقوق محفوظ است</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const images = {{ product.images | tojson }};
+        let currentIndex = 0;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+        function renderDots() {
+            const dotsEl = document.getElementById('dots');
+            if (!dotsEl) return;
+            dotsEl.innerHTML = images.map((_, i) =>
+                `<span class="w-2 h-2 rounded-full ${i === currentIndex ? 'bg-amber' : 'bg-paper-border dark:bg-graphite-border'}"></span>`
+            ).join('');
+        }
+
+        function selectImage(index) {
+            currentIndex = index;
+            const img = document.getElementById('main-image');
+            img.style.opacity = 0;
+            setTimeout(() => {
+                img.src = images[currentIndex];
+                img.style.opacity = 1;
+            }, 120);
+            document.querySelectorAll('.thumb-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === currentIndex);
+            });
+            renderDots();
+        }
+
+        function changeImage(direction) {
+            currentIndex = (currentIndex + direction + images.length) % images.length;
+            selectImage(currentIndex);
+        }
+
+        function selectColor(btn, name) {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('selected-color-name').textContent = name;
+        }
+
+        function updateCartCount() {
+            const countEl = document.getElementById('cart-count');
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            countEl.textContent = totalItems;
+        }
+
+        function addToCart() {
+            const id = "{{ product.id }}";
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                cart.push({
+                    id: id,
+                    name: "{{ product.name }}",
+                    price: "{{ product.price }}",
+                    img: images[0],
+                    quantity: 1
+                });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            alert('به سبد خرید اضافه شد ✔');
+        }
+
+        function toggleWishlist(btn) {
+            const id = "{{ product.id }}";
+            const icon = btn.querySelector('i');
+            if (wishlist.includes(id)) {
+                wishlist = wishlist.filter(x => x !== id);
+                icon.classList.remove('fa-solid');
+                icon.classList.add('fa-regular');
+            } else {
+                wishlist.push(id);
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+            }
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+            renderDots();
+            updateCartCount();
+            const id = "{{ product.id }}";
+            if (wishlist.includes(id)) {
+                const btn = document.getElementById('wishlist-btn');
+                btn.querySelector('i').classList.remove('fa-regular');
+                btn.querySelector('i').classList.add('fa-solid');
+            }
+        };
+    </script>
+    {% include 'chat_widget.html' %}
+</body>
+</html>

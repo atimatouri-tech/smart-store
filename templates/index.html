@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Store - لوازم هوشمند</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: {
+                            DEFAULT: '#0F1012',
+                            surface: '#18191D',
+                            surface2: '#202126',
+                            border: '#2C2D33',
+                            muted: '#92949C'
+                        },
+                        paper: {
+                            DEFAULT: '#FAFAF8',
+                            surface: '#FFFFFF',
+                            surface2: '#F1F1EF',
+                            border: '#E4E4E0',
+                            ink: '#16171A',
+                            muted: '#6E7078'
+                        },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Fredoka:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .header-icon { transition: all 0.25s ease; }
+        .header-icon:hover { transform: translateY(-2px); color: #F2A93B; }
+
+        /* ── Product card hover ── */
+        .spec-card {
+            position: relative;
+            transition:
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.3s ease,
+                box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+        .spec-card:hover {
+            transform: translateY(-14px) scale(1.025);
+            border-color: #F2A93B;
+            box-shadow:
+                0 28px 50px -18px rgba(15, 16, 18, 0.22),
+                0 0 0 1px rgba(242, 169, 59, 0.35);
+            z-index: 10;
+        }
+        .dark .spec-card:hover {
+            box-shadow:
+                0 28px 50px -18px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(242, 169, 59, 0.4);
+        }
+        .spec-card::before, .spec-card::after {
+            content: "";
+            position: absolute;
+            width: 20px; height: 20px;
+            border-color: #F2A93B;
+            border-style: solid;
+            opacity: 0;
+            transition: opacity 0.3s ease, width 0.35s ease, height 0.35s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .spec-card::before { top: -1px; right: -1px; border-width: 2.5px 2.5px 0 0; }
+        .spec-card::after { bottom: -1px; left: -1px; border-width: 0 0 2.5px 2.5px; }
+        .spec-card:hover::before, .spec-card:hover::after {
+            opacity: 1;
+            width: 26px;
+            height: 26px;
+        }
+
+        .img-wrap { position: relative; overflow: hidden; }
+        .img-wrap::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(242,169,59,0.18) 48%, transparent 100%);
+            transform: translateY(-120%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
+        }
+        .spec-card:hover .img-wrap::after { transform: translateY(120%); }
+
+        .product-img {
+            transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .spec-card:hover .product-img { transform: scale(1.1); }
+
+        .spec-card .product-title {
+            transition: font-weight 0.25s ease, color 0.25s ease;
+        }
+        .spec-card:hover .product-title {
+            font-weight: 800;
+            color: #C9861A;
+        }
+        .dark .spec-card:hover .product-title {
+            color: #FFC469;
+        }
+
+        .spec-card .price-chip {
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .spec-card:hover .price-chip {
+            transform: translateX(-4px);
+        }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        .price-num { font-variant-numeric: tabular-nums; }
+
+        .category-item {
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+        }
+        .category-item:hover {
+            border-color: #F2A93B;
+            transform: translateY(-5px);
+        }
+        .category-item.active {
+            border-color: #F2A93B;
+            background: rgba(242,169,59,0.08);
+            box-shadow: 0 0 0 1px rgba(242,169,59,0.3);
+        }
+
+        .buy-btn { transition: all 0.25s ease; }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -8px rgba(242,169,59,0.5); }
+        .buy-btn:active { transform: translateY(0); }
+
+        .badge { animation: pop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes pop {
+            0% { transform: scale(0.4); }
+            60% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+
+        /* ── Background: grain + rich diagonal gradient mesh ── */
+        body {
+            position: relative;
+            background-color: #FAFAF8;
+        }
+        html.dark body { background-color: #0F1012; }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.45;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.949 0 0 0 0 0.663 0 0 0 0 0.231 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(135deg,
+                    rgba(242,169,59,0.16) 0%,
+                    rgba(242,169,59,0.06) 22%,
+                    transparent 45%,
+                    transparent 58%,
+                    rgba(15,16,18,0.05) 82%,
+                    rgba(15,16,18,0.1) 100%),
+                radial-gradient(ellipse 120% 90% at 50% -10%, transparent 55%, rgba(15,16,18,0.05) 100%);
+        }
+        html.dark body::after {
+            background:
+                linear-gradient(135deg,
+                    rgba(242,169,59,0.13) 0%,
+                    rgba(242,169,59,0.04) 22%,
+                    transparent 42%,
+                    transparent 55%,
+                    rgba(0,0,0,0.28) 82%,
+                    rgba(0,0,0,0.4) 100%),
+                radial-gradient(ellipse 120% 90% at 50% -10%, transparent 50%, rgba(0,0,0,0.35) 100%);
+        }
+
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-mesh span {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(90px);
+            opacity: 0.35;
+        }
+        .bg-mesh span.b1 {
+            width: 42vw; height: 42vw;
+            top: -14vw; right: -10vw;
+            background: radial-gradient(circle, #F2A93B 0%, transparent 70%);
+        }
+        .bg-mesh span.b2 {
+            width: 34vw; height: 34vw;
+            bottom: -12vw; left: -8vw;
+            background: radial-gradient(circle, #C9861A 0%, transparent 70%);
+            opacity: 0.22;
+        }
+        html.dark .bg-mesh span.b1 { opacity: 0.22; }
+        html.dark .bg-mesh span.b2 { opacity: 0.16; }
+
+        header, main, footer { position: relative; z-index: 1; }
+
+        .glow-ring { box-shadow: 0 0 0 1px rgba(242,169,59,0.35), 0 0 24px -6px rgba(242,169,59,0.55); }
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+
+        .pulse-dot {
+            position: relative;
+            width: 7px; height: 7px;
+            border-radius: 999px;
+            background: #34D399;
+            flex-shrink: 0;
+        }
+        .pulse-dot::after {
+            content: "";
+            position: absolute; inset: -4px;
+            border-radius: 999px;
+            border: 1.5px solid #34D399;
+            animation: pulse-ring 1.8s cubic-bezier(0.2,0.6,0.4,1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.7); opacity: 0.9; }
+            100% { transform: scale(2.1); opacity: 0; }
+        }
+
+        .hero-title-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            column-gap: 0.6rem;
+            row-gap: 0.25rem;
+        }
+        .hero-line {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(-72px);
+            animation: hero-drop 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hero-line:nth-child(1) { animation-delay: 0.12s; }
+        .hero-line:nth-child(2) { animation-delay: 0.32s; }
+
+        @keyframes hero-drop {
+            0% {
+                opacity: 0;
+                transform: translateY(-72px);
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-eyebrow {
+            opacity: 0;
+            transform: translateY(-28px);
+            animation: hero-drop 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
+        }
+        .hero-bar {
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: right;
+            animation: hero-bar-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+        }
+        @keyframes hero-bar-in {
+            to { opacity: 1; transform: scaleX(1); }
+        }
+        .hero-status {
+            opacity: 0;
+            transform: translateY(12px);
+            animation: hero-drop 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+        }
+
+        .fade-up {
+            opacity: 0;
+            animation: fade-up 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .fade-up, .hero-line, .hero-eyebrow, .hero-bar, .hero-status {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .spec-card:hover { transform: none; }
+        }
+
+        .brands-section {
+            border-top: 1px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        .brands-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(115deg, rgba(242,169,59,0.10) 0%, transparent 38%, transparent 62%, rgba(242,169,59,0.05) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .brand-marquee {
+            position: relative;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+        }
+        .brand-track {
+            display: flex;
+            align-items: center;
+            width: max-content;
+            gap: 0;
+            animation: brand-scroll 32s linear infinite;
+            will-change: transform;
+        }
+        .brand-marquee:hover .brand-track { animation-play-state: paused; }
+        @keyframes brand-scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .brand-track { animation: none; }
+        }
+        .brand-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.15rem 2.4rem;
+            border-radius: 1.1rem;
+            flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), background 0.35s ease;
+        }
+        .brand-card:hover {
+            transform: translateY(-6px);
+            background: rgba(242,169,59,0.07);
+        }
+        .brand-mark {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            color: #fff;
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s ease;
+            overflow: hidden;
+        }
+        .brand-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.18));
+            display: block;
+        }
+        .brand-card:hover .brand-mark {
+            transform: scale(1.1) rotate(-3deg);
+        }
+        .brand-name {
+            font-family: 'Fredoka', 'Vazirmatn', system-ui;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: #6E7078;
+            transition: color 0.3s ease;
+            white-space: nowrap;
+        }
+        .dark .brand-name { color: #92949C; }
+        .brand-card:hover .brand-name { color: var(--bc, #F2A93B); }
+        .brand-underline {
+            width: 0;
+            height: 2.5px;
+            border-radius: 999px;
+            background: var(--bc, #F2A93B);
+            transition: width 0.35s ease;
+        }
+        .brand-card:hover .brand-underline { width: 26px; }
+
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            pointer-events: none;
+        }
+        .toast {
+            pointer-events: auto;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            box-shadow: 0 12px 30px -8px rgba(0,0,0,0.25);
+            animation: toast-in 0.4s cubic-bezier(0.16,1,0.3,1);
+            min-width: 260px;
+            max-width: 90vw;
+        }
+        .toast.success { background: #34D399; color: #0F1012; }
+        .toast.info { background: #F2A93B; color: #0F1012; }
+        .toast.error { background: #EF4444; color: white; }
+        .toast.hiding { animation: toast-out 0.3s ease forwards; }
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toast-out {
+            to { opacity: 0; transform: translateY(12px) scale(0.95); }
+        }
+
+        .cart-bounce { animation: cart-bounce 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes cart-bounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E4E4E0; border-radius: 999px; border: 2px solid #FAFAF8; }
+        .dark ::-webkit-scrollbar-thumb { background: #2C2D33; border: 2px solid #0F1012; }
+        ::-webkit-scrollbar-thumb:hover { background: #F2A93B; }
+        html { scrollbar-width: thin; scrollbar-color: #E4E4E0 transparent; }
+        html.dark { scrollbar-color: #2C2D33 transparent; }
+
+        .heart-active { color: #EF4444 !important; }
+
+        /* ── دستیار محصول غیرچتی (کارت‌های آماده) ── */
+        #pa-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(15,16,18,0.55);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        #pa-overlay.open { display: flex; opacity: 1; }
+        @media (min-width: 768px) {
+            #pa-overlay { align-items: center; }
+        }
+        #pa-panel {
+            width: 100%; max-width: 780px; max-height: 92vh;
+            background: #FAFAF8; border-radius: 1.5rem 1.5rem 0 0;
+            overflow: hidden; display: flex; flex-direction: column;
+            transform: translateY(40px); transition: transform 0.32s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.35);
+        }
+        @media (min-width: 768px) {
+            #pa-panel { border-radius: 1.5rem; max-height: 86vh; }
+        }
+        #pa-overlay.open #pa-panel { transform: translateY(0); }
+        .dark #pa-panel { background: #18191D; }
+
+        #pa-body { overflow-y: auto; padding: 1.5rem; }
+
+        .pa-tag {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            font-size: 11px; font-weight: 700; padding: 0.35rem 0.7rem;
+            border-radius: 999px; letter-spacing: 0.02em;
+        }
+        .pa-card {
+            border: 1px solid #E4E4E0; border-radius: 1rem; padding: 1.25rem;
+            opacity: 0; transform: translateY(14px);
+            animation: pa-card-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        .dark .pa-card { border-color: #2C2D33; }
+        @keyframes pa-card-in { to { opacity: 1; transform: translateY(0); } }
+
+        .pa-skeleton {
+            height: 14px; border-radius: 6px;
+            background: linear-gradient(90deg, #E4E4E0 25%, #F1F1EF 37%, #E4E4E0 63%);
+            background-size: 400% 100%;
+            animation: pa-shimmer 1.4s ease infinite;
+        }
+        .dark .pa-skeleton {
+            background: linear-gradient(90deg, #202126 25%, #2C2D33 37%, #202126 63%);
+            background-size: 400% 100%;
+        }
+        @keyframes pa-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+        .pa-compare-table td, .pa-compare-table th {
+            padding: 0.6rem 0.5rem; font-size: 13px; text-align: right;
+        }
+        .pa-compare-table th { color: #92949C; font-weight: 700; font-size: 11px; }
+        .pa-compare-table tr:not(:last-child) td { border-bottom: 1px solid #E4E4E0; }
+        .dark .pa-compare-table tr:not(:last-child) td { border-bottom: 1px solid #2C2D33; }
+        .pa-compare-highlight { color: #C9861A; font-weight: 800; }
+        .dark .pa-compare-highlight { color: #FFC469; }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <div class="bg-mesh"><span class="b1"></span><span class="b2"></span></div>
+    <div id="toast-container"></div>
+
+    <!-- هدر -->
+    <header class="sticky top-0 bg-paper/95 dark:bg-graphite/95 backdrop-blur-md z-50 border-b border-paper-border dark:border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+                <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+            </div>
+
+            <div class="search-wrapper relative flex-1 hidden sm:block z-50">
+                <input id="search-input" type="text" oninput="searchProducts(this.value)" onfocus="openSearchDropdown(); searchProducts(this.value)" onblur="setTimeout(closeSearchDropdown, 180)" placeholder="جستجوی محصول..." class="w-full bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-lg py-3 pr-11 pl-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber focus:border-amber transition-all">
+                <i class="fas fa-search absolute top-1/2 -translate-y-1/2 right-4 text-paper-muted dark:text-graphite-muted text-sm"></i>
+                <div id="search-dropdown" class="search-dropdown hidden absolute top-full mt-3 left-1/2 -translate-x-1/2 w-[42rem] max-w-[90vw] bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-2xl shadow-2xl overflow-y-auto max-h-[32rem] p-5"></div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-4 text-lg shrink-0">
+                <button onclick="toggleMobileSearch()" class="header-icon p-2.5 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 transition-all sm:hidden" title="جستجو">
+                    <i class="fas fa-search text-base"></i>
+                </button>
+                <button onclick="toggleDarkMode()" class="header-icon p-2.5 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 transition-all" title="تغییر تم">
+                    <span id="theme-icon" class="text-lg">🌙</span>
+                </button>
+                <button onclick="showWishlist()" class="header-icon relative p-2.5 hover:text-red-500 transition-all" title="لیست علاقه‌مندی‌ها">
+                    <i class="fas fa-heart"></i>
+                    <span id="wishlist-count" class="badge absolute -top-1 -right-1 bg-amber text-graphite text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold hidden">0</span>
+                </button>
+                {% if session.user_id %}
+                <a href="/account" class="header-icon flex items-center gap-2 cursor-pointer border border-paper-border dark:border-graphite-border rounded-lg px-3 py-2 hover:border-amber hover:text-amber text-base">
+                    <i class="fas fa-user text-sm"></i>
+                    <span class="text-sm font-medium hidden sm:inline">حساب من</span>
+                </a>
+                {% else %}
+                <a href="/login" class="header-icon flex items-center gap-2 cursor-pointer border border-paper-border dark:border-graphite-border rounded-lg px-3 py-2 hover:border-amber hover:text-amber text-base">
+                    <i class="fas fa-user text-sm"></i>
+                    <span class="text-sm font-medium hidden sm:inline">ورود | ثبت‌نام</span>
+                </a>
+                {% endif %}
+                <a href="/cart" class="header-icon relative p-2.5 hover:text-amber transition-all" title="سبد خرید">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-amber text-graphite text-[10px] w-5 h-5 flex items-center justify-center rounded-full text-center font-bold">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl mx-auto px-6 py-14 w-full">
+        <!-- هیرو با انیمیشن از بالا، خطوط کنار هم -->
+        <div class="mb-16">
+            <p class="eyebrow text-amber mb-4 hero-eyebrow">SMART STORE — TEHRAN</p>
+            <h1 class="hero-title-wrap text-5xl sm:text-6xl font-extrabold mb-4 tracking-tight leading-[1.15] max-w-3xl">
+                <span class="hero-line">لوازم هوشمند آینده</span>
+                <span class="hero-line text-paper-muted dark:text-graphite-muted">تجربه‌ای فراتر از انتظار</span>
+            </h1>
+            <div class="w-16 h-[3px] bg-amber mb-4 hero-bar"></div>
+            <div class="flex items-center gap-2 mb-10 text-xs text-paper-muted dark:text-graphite-muted hero-status">
+                <span class="pulse-dot"></span>
+                <span>موجودی انبار به صورت لحظه‌ای به‌روز می‌شود</span>
+            </div>
+        </div>
+
+        <!-- دسته‌بندی -->
+        <div class="mb-16 fade-up" style="animation-delay:.08s">
+            <div class="flex items-end justify-between mb-8">
+                <div>
+                    <p class="eyebrow text-amber mb-2">دسته‌بندی</p>
+                    <h2 class="text-3xl font-extrabold">دسته‌بندی محصولات</h2>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 md:grid-cols-6 gap-4" id="category-grid"></div>
+        </div>
+
+        <div class="flex items-end justify-between mb-8 fade-up" style="animation-delay:.12s">
+            <div>
+                <p class="eyebrow text-amber mb-2">کاتالوگ</p>
+                <h2 class="text-3xl font-bold" id="products-title">محصولات ویژه</h2>
+            </div>
+            <p id="products-count" class="text-sm text-paper-muted dark:text-graphite-muted"></p>
+        </div>
+
+        <p id="no-results" class="hidden text-center text-paper-muted dark:text-graphite-muted text-lg py-16">
+            <i class="fas fa-search text-3xl mb-4 block opacity-40"></i>
+            محصولی با این مشخصات پیدا نشد.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="products"></div>
+    </main>
+
+    <!-- ══ دستیار محصول غیرچتی — کارت‌های آماده، بدون تایپ کاربر ══ -->
+    <div id="pa-overlay" onclick="if(event.target===this) closeProductAssistant()">
+        <div id="pa-panel">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-paper-border dark:border-graphite-border shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="pa-tag" style="background:rgba(242,169,59,0.15); color:#C9861A;">
+                        <i class="fas fa-sparkles"></i> مشاور محصول
+                    </span>
+                </div>
+                <button onclick="closeProductAssistant()" class="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 text-lg">✕</button>
+            </div>
+            <div id="pa-body"></div>
+        </div>
+    </div>
+
+    <!-- برندها (قبل از فوتر) — نوار متحرک بی‌نهایت با لوگوی واقعی Simple Icons -->
+    <section class="brands-section border-paper-border dark:border-graphite-border py-14 mt-8">
+        <div class="max-w-7xl mx-auto px-6 relative" style="z-index:2;">
+            <p class="eyebrow text-amber mb-2 text-center">برندها</p>
+            <h2 class="text-xl font-bold text-center mb-10 text-paper-muted dark:text-graphite-muted">برندهای برتر فروشگاه</h2>
+        </div>
+        <div class="brand-marquee relative" style="z-index:2;">
+            <div class="brand-track">
+                <!-- set 1 -->
+                <div class="brand-card" style="--bc:#1C1C1E;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#3a3a3c,#1c1c1e); box-shadow:0 8px 20px -8px #3a3a3c88;">
+                        <img src="https://cdn.simpleicons.org/apple/ffffff" alt="Apple" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Apple</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#1428A0;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#1428A0,#0d1a63); box-shadow:0 8px 20px -8px #1428A088;">
+                        <img src="https://cdn.simpleicons.org/samsung/ffffff" alt="Samsung" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Samsung</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#FF6900;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#FF6900,#cc5400); box-shadow:0 8px 20px -8px #FF690088;">
+                        <img src="https://cdn.simpleicons.org/xiaomi/ffffff" alt="Xiaomi" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Xiaomi</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#2b2d33;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#2b2d33,#111318); box-shadow:0 8px 20px -8px #2b2d3388;">
+                        <img src="https://cdn.simpleicons.org/sony/ffffff" alt="Sony" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Sony</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#E1001A;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#E1001A,#a10012); box-shadow:0 8px 20px -8px #E1001A88;">
+                        <img src="https://cdn.simpleicons.org/motorola/ffffff" alt="Motorola" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Motorola</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#0066CC;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#0066CC,#003d7a); box-shadow:0 8px 20px -8px #0066CC88;">
+                        <img src="https://cdn.simpleicons.org/asus/ffffff" alt="Asus" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Asus</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#E2231A;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#E2231A,#a0140f); box-shadow:0 8px 20px -8px #E2231A88;">
+                        <img src="https://cdn.simpleicons.org/lenovo/ffffff" alt="Lenovo" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Lenovo</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#BA0C2F;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#BA0C2F,#7d0620); box-shadow:0 8px 20px -8px #BA0C2F88;">
+                        <img src="https://cdn.simpleicons.org/canon/ffffff" alt="Canon" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Canon</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <!-- set 2 (duplicate for seamless loop) -->
+                <div class="brand-card" style="--bc:#1C1C1E;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#3a3a3c,#1c1c1e); box-shadow:0 8px 20px -8px #3a3a3c88;">
+                        <img src="https://cdn.simpleicons.org/apple/ffffff" alt="Apple" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Apple</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#1428A0;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#1428A0,#0d1a63); box-shadow:0 8px 20px -8px #1428A088;">
+                        <img src="https://cdn.simpleicons.org/samsung/ffffff" alt="Samsung" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Samsung</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#FF6900;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#FF6900,#cc5400); box-shadow:0 8px 20px -8px #FF690088;">
+                        <img src="https://cdn.simpleicons.org/xiaomi/ffffff" alt="Xiaomi" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Xiaomi</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#2b2d33;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#2b2d33,#111318); box-shadow:0 8px 20px -8px #2b2d3388;">
+                        <img src="https://cdn.simpleicons.org/sony/ffffff" alt="Sony" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Sony</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#E1001A;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#E1001A,#a10012); box-shadow:0 8px 20px -8px #E1001A88;">
+                        <img src="https://cdn.simpleicons.org/motorola/ffffff" alt="Motorola" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Motorola</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#0066CC;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#0066CC,#003d7a); box-shadow:0 8px 20px -8px #0066CC88;">
+                        <img src="https://cdn.simpleicons.org/asus/ffffff" alt="Asus" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Asus</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#E2231A;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#E2231A,#a0140f); box-shadow:0 8px 20px -8px #E2231A88;">
+                        <img src="https://cdn.simpleicons.org/lenovo/ffffff" alt="Lenovo" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Lenovo</span>
+                    <span class="brand-underline"></span>
+                </div>
+                <div class="brand-card" style="--bc:#BA0C2F;">
+                    <div class="brand-mark" style="background:linear-gradient(145deg,#BA0C2F,#7d0620); box-shadow:0 8px 20px -8px #BA0C2F88;">
+                        <img src="https://cdn.simpleicons.org/canon/ffffff" alt="Canon" width="36" height="36" loading="lazy">
+                    </div>
+                    <span class="brand-name">Canon</span>
+                    <span class="brand-underline"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-graphite text-ink mt-auto border-t border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div>
+                    <p class="eyebrow text-amber mb-3">تماس</p>
+                    <h3 class="text-lg font-bold mb-4">تماس با ما</h3>
+                    <div class="space-y-3 text-sm text-graphite-muted">
+                        <p class="flex items-center gap-3"><i class="fas fa-phone text-amber"></i><a href="tel:09337841462" class="hover:text-amber">۰۹۳۳۷۸۴۱۴۶۲</a></p>
+                        <p class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-amber"></i><span>تهران، میرداماد، خیابان سنجابی، پلاک ۷</span></p>
+                    </div>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">شبکه‌های اجتماعی</p>
+                    <h3 class="text-lg font-bold mb-4">ما را دنبال کنید</h3>
+                    <div class="flex gap-5 text-2xl text-graphite-muted">
+                        <a href="#" class="hover:text-amber transition-colors"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-amber transition-colors"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">درباره</p>
+                    <h3 class="text-lg font-bold mb-2">Smart Store</h3>
+                    <p class="text-graphite-muted text-sm">فروشگاه تخصصی لوازم هوشمند</p>
+                    <p class="mt-6 text-xs text-graphite-muted mono">© ۱۴۰۵ Smart Store — تمامی حقوق محفوظ است</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const products = [
+            {id: 1, name: "آیفون ۱۶ پرو مکس اپل مدل iPhone 16 Pro Max ZAA", price: "۳۴۵,۰۰۰,۰۰۰", img: "/static/images/گوشی_موبایل_اپل_مدل_iPhone_16_Pro_Max_ZAA-removebg-preview.png", category: "mobile"},
+            {id: 2, name: "ساعت هوشمند اپل مدل Ultra 3", price: "۳۸,۰۰۰,۰۰۰", img: "/static/images/ساعت_هوشمند_اپل_مدل_Ultra_3-removebg-preview.png", category: "watch"},
+            {id: 3, name: "هدفون بلوتوثی اپل مدل AirPods 4", price: "۲۹,۵۰۰,۰۰۰", img: "/static/images/هدفون_بلوتوثی_اپل_مدل_AirPods_4_-removebg-preview.png", category: "audio"},
+            {id: 4, name: "لپ تاپ مدل MacBook Pro 2025", price: "۴۸۱,۰۰۰,۰۰۰", img: "/static/images/MacBook_Air_MDHK4_2026-removebg-preview.png", category: "laptop"},
+            {id: 5, name: "شارژر بی سیم مدل مگ سیف 7", price: "۱۲,۰۰۰,۰۰۰", img: "/static/images/داک_شارژر_بی_سیم_مدل_مگ_سیف_A37-removebg-preview.png", category: "accessory"},
+            {id: 6, name: "دوربین سونی A۷ IV", price: "۳۳۵,۰۰۰,۰۰۰", img: "/static/images/دوربین_سونی_A۷_IV-removebg-preview.png", category: "camera"},
+            {id: 7, name: "داک شارژر بی سیم مدل مگ سیف A60", price: "۱۲,۸۰۰,۰۰۰", img: "/static/images/داک_شارژر_بی_سیم_مدل_مگ_سیف_A60-removebg-preview.png", category: "accessory"},
+            {id: 8, name: "هدفون سونی WH-1000XM5", price: "۱۸,۵۰۰,۰۰۰", img: "/static/images/headphone.png", category: "audio"},
+            {id: 9, name: "گلکسی واچ ۷", price: "۲۲,۰۰۰,۰۰۰", img: "/static/images/watch.png", category: "watch"},
+            {id: 10, name: "گوشی موبایل سامسونگ مدل Galaxy S25 FE", price: "۱۲۵,۰۰۰,۰۰۰", img: "/static/images/galaxys25-removebg-preview.png", category: "mobile"},
+            {id: 11, name: "گوشی موبایل سامسونگ مدل Galaxy A26", price: "۴۴,۰۰۰,۰۰۰", img: "/static/images/گوشی_موبایل_سامسونگ_مدل_Galaxy_A26-removebg-preview.png", category: "mobile"},
+            {id: 12, name: "آیفون ۱۶ گوشی موبایل اپل مدل iPhone 16 CH", price: "۲۲۲,۰۰۰,۰۰۰", img: "/static/images/گوشی_موبایل_اپل_مدل_iPhone_16_CH-removebg-preview.png", category: "mobile"},
+            {id: 13, name: "ساعت هوشمند شیائومی مدل Redmi Watch 5 Lite", price: "۳,۸۰۰,۰۰۰", img: "/static/images/ئومی_Redmi_Watch_5_Lite_-.png", category: "watch"},
+            {id: 14, name: "ساعت هوشمند هایلو مدل Solar Lite", price: "۱,۶۰۰,۰۰۰", img: "/static/images/__Solar_Lite--.png", category: "watch"},
+            {id: 15, name: "ساعت هوشمند مدل C39 Pro MAX", price: "۱,۹۵۰,۰۰۰", img: "/static/images/C39_Pro_MAX-removebg-preview.png", category: "watch"},
+            {id: 16, name: "ساعت هوشمند 47 میلی متری فنیرسی مدل S370i", price: "۱,۴۵۰,۰۰۰", img: "/static/images/s370فنیرسی-removebg-preview.png", category: "watch"},
+            {id: 17, name: "ساعت هوشمند 46 میلی متری مدل WS40 MAX", price: "۱,۲۵۰,۰۰۰", img: "/static/images/WS40_MAX-removebg-preview.png", category: "watch"},
+            {id: 18, name: "گوشی موبایل اپل مدل iPhone 17 Pro Max ZAA", price: "۲۹۰,۰۰۰,۰۰۰", img: "/static/images/galaxys25-removebg-preview.png", category: "mobile"},
+            {id: 19, name: "گوشی موبایل سامسونگ مدل Galaxy S26 Ultra", price: "۳۱۹,۹۹۹,۰۰۰", img: "/static/images/Galaxy_S26_Ultra_-removebg-preview.png", category: "mobile"},
+            {id: 20, name: "گوشی موبایل موتورولا مدل Edge 60 Fusion", price: "۳۷,۷۰۰,۰۰۰", img: "/static/images/Edge_60_Fusion-removebg-preview.png", category: "mobile"},
+            {id: 22, name: "گوشی موبایل سامسونگ مدل Galaxy A57", price: "۴۲,۰۰۰,۰۰۰", img: "/static/images/Galaxy_A57-removebg-preview.png", category: "mobile"},
+            {id: 23, name: "گوشی موبایل اپل مدل iPhone 14 CH", price: "۴۸,۰۰۰,۰۰۰", img: "/static/images/iPhone_14_CH_-removebg-preview.png", category: "mobile"},
+            {id: 24, name: "گوشی موبایل سامسونگ مدل Galaxy A16 4G", price: "۱۴,۵۰۰,۰۰۰", img: "/static/images/Galaxy_A16_4G-removebg-preview.png", category: "mobile"},
+            {id: 25, name: "هدفون بی سیم بلوتوث مدل P47-5.0+EDR", price: "۱,۸۵۰,۰۰۰", img: "/static/images/هدفون_بلوتوثی_مدل_P47_EDR_-removebg-preview.png", category: "audio"},
+            {id: 26, name: "هدست بلوتوثی مدل P9", price: "۱,۶۵۰,۰۰۰", img: "/static/images/هدست_بلوتوثی_مدل_p9-removebg-preview.png", category: "audio"},
+            {id: 27, name: "هدفون بی سیم بی اچ جی بی ال مدل VJ083", price: "۱,۴۵۰,۰۰۰", img: "/static/images/هدفون_بی_سیم_بی_اچ_جی_بی_ال_مدل_VJ083-removebg-preview.png", category: "audio"},
+            {id: 28, name: "هدفون بلوتوثی مدل J-30", price: "۱,۱۹۵,۰۰۰", img: "/static/images/هدفون_بلوتوثی_مدل_J-30-removebg-preview.png", category: "audio"},
+            {id: 29, name: "تبلت 11.2 اینچ شیائومی مدل Pad 7 Wi-Fi", price: "۱۹,۵۰۰,۰۰۰", img: "/static/images/Pad_7_Wi-Fi-removebg-preview.png", category: "tablet"},
+            {id: 30, name: "تبلت 12.1 اینچ شیائومی مدل Poco Pad M1 Wi-Fi", price: "۱۶,۸۰۰,۰۰۰", img: "/static/images/Poco_Pad_M1_Wi-Fi_-removebg-preview.png", category: "tablet"},
+            {id: 31, name: "تبلت ۱۱ اینچ اپل مدل iPad Pro 2025 M5 Wi-Fi", price: "۸۵,۰۰۰,۰۰۰", img: "/static/images/IPad_Pro_2025_M5_Wi-Fi-removebg-preview.png", category: "tablet"},
+            {id: 32, name: "تبلت 8.3 اینچی اپل مدل iPad Mini 7th Generation", price: "۳۸,۰۰۰,۰۰۰", img: "/static/images/iPad_Mini_7th_Generation_2024_Wi-Fi_-removebg-preview.png", category: "tablet"},
+            {id: 33, name: "لپ تاپ لنوو مدل IdeaPad 1 15IJL7 با پردازنده Celeron N4500", price: "۳۹,۵۰۰,۰۰۰", img: "/static/images/IdeaPad_Slim_3_15IRU8-removebg-preview.png", category: "laptop"},
+            {id: 34, name: "لپ تاپ 16 اینچی ایسوس مدل TUF Gaming F16 FX608JMR-F16I75060-i7", price: "۳۱۳,۰۰۰,۰۰۰", img: "/static/images/لپ_تاپ_16_اینچی_ایسوس_مدل-removebg-preview.png", category: "laptop"},
+            {id: 35, name: "لپ‌تاپ 15.6 اینچی لنوو مدل LOQ Essential 15IRX11-i5 13450HX-RTX5050", price: "۹۵,۰۰۰,۰۰۰", img: "/static/images/lenovo loq 16 inch.png", category: "laptop"},
+            {id: 36, name: "دوربین عکاسی DSLR کانن مدل EOS 2000D", price: "۲۸,۰۰۰,۰۰۰", img: "/static/images/وربین_عکاسی_DSLR_کانن_مدل_EOS_2000D-removebg-preview.png", category: "camera"},
+            {id: 37, name: "دوربین عکاسی DSLR کانن EOS 250D", price: "۱۱۹,۰۰۰,۰۰۰", img: "/static/images/دوربین_عکاسی_DSLR_کانن_EOS_250D-removebg-preview.png", category: "camera"},
+            {id: 38, name: "دوربین دیجیتال کامپکت سامسونگ مدل ST69", price: "۵۴,۵۰۰,۰۰۰", img: "/static/images/وربین_دیجیتال_کامپکت_سامسونگ_مدل_ST69-removebg-preview.png", category: "camera"}
+        ];
+
+        const categories = [
+            {name: "موبایل", key: "mobile", image: "/static/images/cellphone.png"},
+            {name: "ساعت", key: "watch", image: "/static/images/watch.png"},
+            {name: "لوازم جانبی", key: "accessory", image: "/static/images/vasile.png"},
+            {name: "هدفون", key: "audio", image: "/static/images/headphone.png"},
+            {name: "تبلت", key: "tablet", image: "/static/images/tablet.png"},
+            {name: "دوربین", key: "camera", image: "/static/images/camera.png"}
+        ];
+
+        const categoryLabels = {
+            mobile: "موبایل", watch: "ساعت", accessory: "لوازم جانبی",
+            audio: "هدفون", tablet: "تبلت", laptop: "لپ‌تاپ", camera: "دوربین"
+        };
+
+        let currentCategory = 'all';
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✓' : type === 'info' ? '♥' : '!';
+            toast.innerHTML = `<span class="text-lg">${icon}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 2400);
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('category-grid');
+            container.innerHTML = categories.map((cat, i) => `
+                <div onclick="filterCategory('${cat.key}')"
+                     class="category-item fade-up bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-xl p-5 text-center cursor-pointer group ${currentCategory === cat.key ? 'active' : ''}"
+                     style="animation-delay:${0.1 + i * 0.05}s"
+                     data-key="${cat.key}">
+                    <img src="${cat.image}" class="w-full h-20 object-contain mb-3 transition-transform group-hover:scale-110" alt="${cat.name}">
+                    <p class="font-bold text-base">${cat.name}</p>
+                </div>
+            `).join('');
+        }
+
+        function isInWishlist(id) {
+            return wishlist.includes(id);
+        }
+
+        function renderProducts(filteredProducts = products) {
+            const container = document.getElementById('products');
+            const noResults = document.getElementById('no-results');
+            const countEl = document.getElementById('products-count');
+            countEl.textContent = `${filteredProducts.length} محصول`;
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+
+            container.innerHTML = filteredProducts.map((p, i) => {
+                const inWish = isInWishlist(p.id);
+                return `
+                <div id="product-${p.id}" onclick="openProductAssistant(${p.id})"
+                     class="spec-card fade-up bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-xl overflow-hidden flex flex-col cursor-pointer"
+                     style="animation-delay:${Math.min(i * 0.035, 0.35)}s">
+                    <div class="img-wrap relative bg-paper-surface2 dark:bg-graphite-surface2">
+                        <img src="${p.img}" class="product-img w-full h-56 object-contain p-6" alt="${p.name}">
+                        <button onclick="event.stopPropagation(); toggleWishlist(${p.id})"
+                                class="absolute top-3 left-3 w-9 h-9 bg-paper-surface/90 dark:bg-graphite-surface/90 backdrop-blur rounded-lg flex items-center justify-center border border-transparent hover:border-amber transition-all wishlist-btn">
+                            <i class="fas fa-heart text-sm ${inWish ? 'heart-active' : 'text-paper-muted dark:text-graphite-muted'}"></i>
+                        </button>
+                        <span class="absolute bottom-3 right-3 flex items-center gap-1.5 bg-paper-surface/90 dark:bg-graphite-surface/90 backdrop-blur px-2 py-1 rounded-full text-[10px] font-bold text-mint">
+                            <span class="pulse-dot"></span> موجود
+                        </span>
+                    </div>
+                    <div class="p-5 flex flex-col flex-1">
+                        <p class="eyebrow text-paper-muted dark:text-graphite-muted mb-2">${categoryLabels[p.category] || p.category}</p>
+                        <h3 class="text-base font-bold mb-3 product-title leading-relaxed line-clamp-2">${p.name}</h3>
+                        <p class="price-chip mt-auto pt-3 border-t border-paper-border dark:border-graphite-border">
+                            <span class="price-num text-xl font-extrabold mono text-amber-deep dark:text-amber">${p.price}</span>
+                            <span class="text-xs font-normal text-paper-muted dark:text-graphite-muted mr-1">تومان</span>
+                        </p>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="event.stopPropagation(); addToCartReal(${p.id})"
+                                    class="buy-btn flex-1 bg-amber text-graphite py-3 rounded-lg font-bold text-sm hover:bg-amber-strong transition-all">
+                                خرید سریع
+                            </button>
+                            <button onclick="event.stopPropagation(); toggleWishlist(${p.id})"
+                                    class="w-12 border border-paper-border dark:border-graphite-border rounded-lg flex items-center justify-center hover:border-red-400 transition-all">
+                                <i class="fas fa-heart text-sm ${inWish ? 'heart-active' : 'text-paper-muted dark:text-graphite-muted'}"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateCartCount() {
+            const countEl = document.getElementById('cart-count');
+            if (!countEl) return;
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            countEl.textContent = totalItems;
+            countEl.classList.remove('cart-bounce');
+            void countEl.offsetWidth;
+            countEl.classList.add('cart-bounce');
+        }
+
+        function addToCartReal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity = (existing.quantity || 1) + 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast('به سبد خرید اضافه شد', 'success');
+        }
+
+        function toggleWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+                showToast('از علاقه‌مندی‌ها حذف شد', 'info');
+            } else {
+                wishlist.push(productId);
+                showToast('به علاقه‌مندی‌ها اضافه شد', 'info');
+            }
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+            document.querySelectorAll(`#product-${productId} .fa-heart`).forEach(icon => {
+                icon.classList.toggle('heart-active', isInWishlist(productId));
+                icon.classList.toggle('text-paper-muted', !isInWishlist(productId));
+                icon.classList.toggle('dark:text-graphite-muted', !isInWishlist(productId));
+            });
+        }
+
+        function updateWishlistCount() {
+            const countEl = document.getElementById('wishlist-count');
+            countEl.textContent = wishlist.length;
+            countEl.classList.toggle('hidden', wishlist.length === 0);
+            if (wishlist.length > 0) {
+                countEl.classList.remove('badge');
+                void countEl.offsetWidth;
+                countEl.classList.add('badge');
+            }
+        }
+
+        function showWishlist() {
+            if (wishlist.length === 0) {
+                showToast('لیست علاقه‌مندی‌ها خالی است', 'info');
+                return;
+            }
+            const names = wishlist.map(id => {
+                const p = products.find(pr => pr.id === id);
+                return p ? p.name.slice(0, 28) + (p.name.length > 28 ? '…' : '') : '';
+            }).filter(Boolean).join('\n• ');
+            alert(`❤️ علاقه‌مندی‌های شما (${wishlist.length} مورد):\n\n• ${names}`);
+        }
+
+        function filterCategory(category) {
+            currentCategory = category;
+            document.getElementById('search-input').value = '';
+            const mobileInput = document.getElementById('search-input-mobile');
+            if (mobileInput) mobileInput.value = '';
+            closeSearchDropdown();
+            document.querySelectorAll('.category-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.key === category);
+            });
+            const title = document.getElementById('products-title');
+            if (category === 'all') {
+                title.textContent = 'محصولات ویژه';
+                renderProducts(products);
+            } else {
+                title.textContent = categoryLabels[category] || category;
+                renderProducts(products.filter(p => p.category === category));
+            }
+        }
+
+        function searchProducts(query) {
+            const q = (query || '').trim().toLowerCase();
+            const dropdown = document.getElementById('search-dropdown');
+            if (!dropdown) return;
+            if (!q) {
+                dropdown.innerHTML = '<p class="text-center text-paper-muted dark:text-graphite-muted text-sm py-6">عبارت مورد نظر را وارد کنید...</p>';
+                dropdown.classList.remove('hidden');
+                return;
+            }
+            const filtered = products.filter(p =>
+                p.name.toLowerCase().includes(q) ||
+                (categoryLabels[p.category] || p.category).toLowerCase().includes(q)
+            );
+            renderSearchDropdown(filtered, q);
+        }
+
+        function renderSearchDropdown(filtered, query) {
+            const dropdown = document.getElementById('search-dropdown');
+            if (!dropdown) return;
+            if (filtered.length === 0) {
+                dropdown.innerHTML = `<p class="text-center text-paper-muted dark:text-graphite-muted text-sm py-6">محصولی با «${query}» پیدا نشد.</p>`;
+                dropdown.classList.remove('hidden');
+                return;
+            }
+            dropdown.innerHTML = filtered.slice(0, 8).map(p => `
+                <div onclick="selectSearchResult(${p.id})" class="flex items-center gap-4 p-3 rounded-xl cursor-pointer hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 transition-all">
+                    <img src="${p.img}" class="w-14 h-14 object-contain rounded-lg bg-paper-surface2 dark:bg-graphite-surface2 p-1 shrink-0" alt="">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-sm truncate">${p.name}</p>
+                        <p class="text-xs text-paper-muted dark:text-graphite-muted mt-0.5">${categoryLabels[p.category] || p.category}</p>
+                    </div>
+                    <p class="text-sm font-bold mono text-amber-deep dark:text-amber shrink-0">${p.price}</p>
+                </div>
+            `).join('') + (filtered.length > 8 ? `
+                <p class="text-center text-xs text-paper-muted dark:text-graphite-muted pt-3 border-t border-paper-border dark:border-graphite-border mt-2">
+                    و ${filtered.length - 8} نتیجه دیگر...
+                </p>
+            ` : '');
+            dropdown.classList.remove('hidden');
+        }
+
+        function openSearchDropdown() {
+            const dropdown = document.getElementById('search-dropdown');
+            if (dropdown) dropdown.classList.remove('hidden');
+        }
+
+        function closeSearchDropdown() {
+            const dropdown = document.getElementById('search-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+        }
+
+        function selectSearchResult(id) {
+            closeSearchDropdown();
+            openProductAssistant(id);
+        }
+
+        function toggleMobileSearch() {
+            let mobileBar = document.getElementById('mobile-search-bar');
+            if (!mobileBar) {
+                mobileBar = document.createElement('div');
+                mobileBar.id = 'mobile-search-bar';
+                mobileBar.className = 'sm:hidden px-4 pb-3 border-b border-paper-border dark:border-graphite-border bg-paper/95 dark:bg-graphite/95';
+                mobileBar.innerHTML = `
+                    <div class="relative">
+                        <input id="search-input-mobile" type="text"
+                            oninput="searchProducts(this.value)"
+                            onfocus="openSearchDropdown(); searchProducts(this.value)"
+                            onblur="setTimeout(closeSearchDropdown, 180)"
+                            placeholder="جستجوی محصول..."
+                            class="w-full bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-lg py-3 pr-11 pl-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber focus:border-amber">
+                        <i class="fas fa-search absolute top-1/2 -translate-y-1/2 right-4 text-paper-muted dark:text-graphite-muted text-sm"></i>
+                    </div>
+                `;
+                const header = document.querySelector('header > div');
+                header.parentNode.insertBefore(mobileBar, header.nextSibling);
+            } else {
+                mobileBar.remove();
+                closeSearchDropdown();
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           دستیار محصول غیرچتی
+           با کلیک روی محصول، به‌جای چت، سه کارت آماده نشون داده می‌شه:
+           «چرا این گزینه خوبه»، «مقایسه با مشابه‌ها»، «برای چه کسی مناسبه»
+           ابتدا از /api/product-insight (سمت سرور/AI) تلاش می‌کنیم،
+           و اگر جواب نداد از منطق محلی (fallback) استفاده می‌کنیم.
+           ══════════════════════════════════════════════════════════ */
+
+        function priceToNumber(priceStr) {
+            const fa2en = s => s.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+            return parseInt(fa2en(priceStr).replace(/,/g, ''), 10) || 0;
+        }
+
+        function openProductAssistant(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const overlay = document.getElementById('pa-overlay');
+            const body = document.getElementById('pa-body');
+            overlay.dataset.productId = productId;
+            document.body.style.overflow = 'hidden';
+
+            body.innerHTML = paHeaderHtml(product) + paSkeletonHtml();
+            overlay.classList.add('open');
+
+            fetchProductInsight(product);
+        }
+
+        function closeProductAssistant() {
+            document.getElementById('pa-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function paHeaderHtml(p) {
+            return `
+                <div class="flex gap-4 mb-6 pb-6 border-b border-paper-border dark:border-graphite-border">
+                    <img src="${p.img}" class="w-24 h-24 object-contain bg-paper-surface2 dark:bg-graphite-surface2 rounded-xl p-2 shrink-0" alt="${p.name}">
+                    <div class="flex-1 min-w-0">
+                        <p class="eyebrow text-amber mb-1">${categoryLabels[p.category] || p.category}</p>
+                        <h3 class="font-bold text-lg leading-snug mb-2">${p.name}</h3>
+                        <p><span class="price-num text-xl font-extrabold mono text-amber-deep dark:text-amber">${p.price}</span>
+                           <span class="text-xs text-paper-muted dark:text-graphite-muted mr-1">تومان</span></p>
+                    </div>
+                </div>`;
+        }
+
+        function paSkeletonHtml() {
+            return `
+                <div class="space-y-4" id="pa-loading-block">
+                    ${[0,1,2].map(() => `
+                        <div class="pa-card">
+                            <div class="pa-skeleton w-1/3 mb-3"></div>
+                            <div class="pa-skeleton mb-2"></div>
+                            <div class="pa-skeleton w-4/5"></div>
+                        </div>
+                    `).join('')}
+                </div>`;
+        }
+
+        async function fetchProductInsight(product) {
+            // تلاش برای گرفتن تحلیل واقعی از سرور/هوش مصنوعی؛
+            // اگر endpoint موجود نبود یا خطا داد، از تحلیل محلی استفاده می‌کنیم.
+            try {
+                const res = await fetch('/api/product-insight', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_id: product.id })
+                });
+                if (!res.ok) throw new Error('no endpoint');
+                const data = await res.json();
+                renderPaCards(product, data);
+            } catch (e) {
+                renderPaCards(product, buildLocalInsight(product));
+            }
+        }
+
+        function buildLocalInsight(product) {
+            const sameCategory = products.filter(p => p.category === product.category && p.id !== product.id);
+            const price = priceToNumber(product.price);
+            const cheaper = sameCategory.filter(p => priceToNumber(p.price) < price).length;
+            const pricier = sameCategory.filter(p => priceToNumber(p.price) > price).length;
+            const rankText = sameCategory.length === 0
+                ? 'در حال حاضر تنها گزینه در این دسته‌بندی است.'
+                : (cheaper > pricier
+                    ? `نسبت به ${cheaper} محصول دیگر در دسته «${categoryLabels[product.category]}» قیمت مناسب‌تری دارد.`
+                    : `در بخش بالای بازه‌ی قیمتی دسته «${categoryLabels[product.category]}» قرار دارد و معمولاً با کیفیت و امکانات بیشتر همراه است.`);
+
+            const alternatives = sameCategory
+                .sort((a, b) => Math.abs(priceToNumber(a.price) - price) - Math.abs(priceToNumber(b.price) - price))
+                .slice(0, 2);
+
+            const useCaseMap = {
+                mobile: 'کسانی که به دنبال گوشی روزمره با دوربین و باتری خوب هستند.',
+                watch: 'افرادی که می‌خوان سلامتی و فعالیت روزانه‌شون رو دنبال کنن.',
+                audio: 'علاقه‌مندان به موسیقی و کسانی که زمان زیادی با هدفون سر می‌کنن.',
+                laptop: 'دانشجویان، کارمندان و کسانی که به یک لپ‌تاپ قابل‌اعتماد نیاز دارن.',
+                accessory: 'کسانی که دنبال یک لوازم جانبی کاربردی و مکمل گجت‌هاشون هستن.',
+                camera: 'علاقه‌مندان به عکاسی، از مبتدی تا حرفه‌ای.',
+                tablet: 'کسانی که برای مطالعه، سرگرمی یا کار سبک به یک صفحه بزرگ‌تر نیاز دارن.'
+            };
+
+            return {
+                why: rankText + ' ' + 'همچنین برند و دسته‌بندی محصول تضمین می‌کنه که با استانداردهای فعلی بازار همخوانی داره.',
+                compare: alternatives.map(a => ({ name: a.name, price: a.price })),
+                for_whom: useCaseMap[product.category] || 'مناسب برای استفاده روزمره.'
+            };
+        }
+
+        function renderPaCards(product, insight) {
+            const loadingBlock = document.getElementById('pa-loading-block');
+            if (loadingBlock) loadingBlock.remove();
+
+            const body = document.getElementById('pa-body');
+            const compareRows = (insight.compare || []).map(alt => `
+                <tr>
+                    <td>${alt.name}</td>
+                    <td class="mono">${alt.price} تومان</td>
+                </tr>`).join('');
+
+            const cardsHtml = `
+                <div class="space-y-4">
+                    <div class="pa-card" style="animation-delay:.05s">
+                        <p class="pa-tag mb-3" style="background:rgba(52,211,153,0.15); color:#0e9f6e;">
+                            <i class="fas fa-circle-check"></i> چرا این گزینه‌ی خوبیه
+                        </p>
+                        <p class="text-sm leading-7 text-paper-ink dark:text-ink">${insight.why}</p>
+                    </div>
+
+                    <div class="pa-card" style="animation-delay:.15s">
+                        <p class="pa-tag mb-3" style="background:rgba(242,169,59,0.15); color:#C9861A;">
+                            <i class="fas fa-scale-balanced"></i> مقایسه با مشابه‌ها
+                        </p>
+                        ${compareRows ? `
+                            <table class="pa-compare-table w-full">
+                                <thead><tr><th>محصول</th><th>قیمت</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="pa-compare-highlight">${product.name}</td><td class="mono pa-compare-highlight">${product.price} تومان</td></tr>
+                                    ${compareRows}
+                                </tbody>
+                            </table>
+                        ` : `<p class="text-sm text-paper-muted dark:text-graphite-muted">در حال حاضر گزینه مشابه‌ی دیگری برای مقایسه ثبت نشده.</p>`}
+                    </div>
+
+                    <div class="pa-card" style="animation-delay:.25s">
+                        <p class="pa-tag mb-3" style="background:rgba(146,148,156,0.15); color:#6E7078;">
+                            <i class="fas fa-user-check"></i> برای چه کسی مناسبه
+                        </p>
+                        <p class="text-sm leading-7 text-paper-ink dark:text-ink">${insight.for_whom}</p>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="addToCartReal(${product.id}); closeProductAssistant();"
+                                class="buy-btn flex-1 bg-amber text-graphite py-3 rounded-lg font-bold text-sm hover:bg-amber-strong transition-all">
+                            افزودن به سبد خرید
+                        </button>
+                        <a href="/product/${product.id}"
+                           class="flex-1 border border-paper-border dark:border-graphite-border rounded-lg flex items-center justify-center font-bold text-sm hover:border-amber hover:text-amber transition-all">
+                            مشاهده کامل محصول
+                        </a>
+                    </div>
+                </div>`;
+
+            body.insertAdjacentHTML('beforeend', cardsHtml);
+        }
+
+        function init() {
+            renderCategories();
+            renderProducts();
+            updateWishlistCount();
+            updateCartCount();
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+        }
+
+        window.onload = init;
+    </script>
+    {% include 'chat_widget.html' %}
+</body>
+</html>

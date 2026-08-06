@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود - Smart Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: { DEFAULT: '#0F1012', surface: '#18191D', surface2: '#202126', border: '#2C2D33', muted: '#92949C' },
+                        paper: { DEFAULT: '#FAFAF8', surface: '#FFFFFF', surface2: '#F1F1EF', border: '#E4E4E0', ink: '#16171A', muted: '#6E7078' },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: { vazir: ['Vazirmatn', 'system-ui'], mono: ['"JetBrains Mono"', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        body {
+            background-image:
+                linear-gradient(rgba(242,169,59,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(242,169,59,0.05) 1px, transparent 1px);
+            background-size: 42px 42px;
+        }
+        html.dark body {
+            background-image:
+                linear-gradient(rgba(242,169,59,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(242,169,59,0.06) 1px, transparent 1px);
+        }
+
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+        .glow-ring { box-shadow: 0 0 0 1px rgba(242,169,59,0.35), 0 0 32px -8px rgba(242,169,59,0.5); }
+
+        .pulse-dot { position: relative; width: 7px; height: 7px; border-radius: 999px; background: #34D399; flex-shrink: 0; }
+        .pulse-dot::after {
+            content: ""; position: absolute; inset: -4px; border-radius: 999px; border: 1.5px solid #34D399;
+            animation: pulse-ring 1.8s cubic-bezier(0.2,0.6,0.4,1) infinite;
+        }
+        @keyframes pulse-ring { 0% { transform: scale(0.7); opacity: 0.9; } 100% { transform: scale(2.1); opacity: 0; } }
+
+        .fade-up { opacity: 0; animation: fade-up 0.55s ease forwards; }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; opacity: 1; } }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E4E4E0; border-radius: 999px; border: 2px solid #FAFAF8; }
+        html.dark ::-webkit-scrollbar-thumb { background: #2C2D33; border: 2px solid #0F1012; }
+        ::-webkit-scrollbar-thumb:hover { background: #F2A93B; }
+        html { scrollbar-width: thin; scrollbar-color: #E4E4E0 transparent; }
+        html.dark { scrollbar-color: #2C2D33 transparent; }
+
+        .field { transition: all 0.2s ease; }
+        .field:focus { border-color: #F2A93B; box-shadow: 0 0 0 3px rgba(242,169,59,0.15); }
+
+        .submit-btn { transition: all 0.25s ease; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(242,169,59,0.45); }
+        .submit-btn:active { transform: translateY(0); }
+
+        .corner-box { position: relative; }
+        .corner-box::before, .corner-box::after {
+            content: ""; position: absolute; width: 16px; height: 16px; border-color: #F2A93B; border-style: solid; opacity: 0.5; pointer-events: none;
+        }
+        .corner-box::before { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+        .corner-box::after { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <header class="border-b border-paper-border dark:border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-3">
+                <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+                <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+            </a>
+            <a href="/" class="text-sm text-paper-muted dark:text-graphite-muted hover:text-amber flex items-center gap-2">
+                بازگشت به فروشگاه <i class="fas fa-arrow-left text-xs"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-6 py-16">
+        <div class="w-full max-w-md fade-up">
+            <p class="eyebrow text-amber mb-3 text-center">SMART STORE ACCOUNT</p>
+            <h1 class="text-3xl font-extrabold text-center mb-2">ورود به حساب کاربری</h1>
+            <p class="text-sm text-paper-muted dark:text-graphite-muted text-center mb-8">برای مشاهده سفارش‌ها و لیست علاقه‌مندی‌ها وارد شوید</p>
+
+            {% if error %}
+            <div class="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-500 text-sm rounded-lg py-3 px-4 mb-5">
+                <i class="fas fa-circle-exclamation"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/login" class="corner-box glow-ring bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-xl p-8 space-y-5">
+                <div>
+                    <label class="eyebrow text-paper-muted dark:text-graphite-muted mb-2 block">شماره موبایل</label>
+                    <input type="tel" name="phone" required placeholder="۰۹xxxxxxxxx"
+                           class="field w-full bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-lg py-3 px-4 text-sm outline-none mono">
+                </div>
+                <div>
+                    <label class="eyebrow text-paper-muted dark:text-graphite-muted mb-2 block">رمز عبور</label>
+                    <input type="password" name="password" required placeholder="••••••••"
+                           class="field w-full bg-paper-surface2 dark:bg-graphite-surface2 border border-paper-border dark:border-graphite-border rounded-lg py-3 px-4 text-sm outline-none">
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center gap-2 text-paper-muted dark:text-graphite-muted cursor-pointer">
+                        <input type="checkbox" name="remember" class="accent-amber w-4 h-4">
+                        مرا به خاطر بسپار
+                    </label>
+                    <a href="/forgot-password" class="text-amber hover:text-amber-deep dark:hover:text-amber-strong font-medium">فراموشی رمز عبور</a>
+                </div>
+
+                <button type="submit" class="submit-btn w-full bg-amber text-graphite py-3.5 rounded-lg font-bold">
+                    ورود
+                </button>
+
+                <div class="flex items-center gap-3 text-xs text-paper-muted dark:text-graphite-muted">
+                    <div class="flex-1 h-px bg-paper-border dark:bg-graphite-border"></div>
+                    یا
+                    <div class="flex-1 h-px bg-paper-border dark:bg-graphite-border"></div>
+                </div>
+
+                <p class="text-center text-sm text-paper-muted dark:text-graphite-muted">
+                    حساب کاربری ندارید؟
+                    <a href="/register" class="text-amber font-bold hover:text-amber-deep dark:hover:text-amber-strong">ثبت‌نام کنید</a>
+                </p>
+            </form>
+
+            <p class="flex items-center justify-center gap-2 mt-6 text-xs text-paper-muted dark:text-graphite-muted">
+                <span class="pulse-dot"></span> اتصال امن و رمزنگاری‌شده
+            </p>
+        </div>
+    </main>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+</body>
+</html>

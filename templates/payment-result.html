@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتیجه پرداخت - Smart Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: { DEFAULT: '#0F1012', surface: '#18191D', surface2: '#202126', border: '#2C2D33', muted: '#92949C' },
+                        paper: { DEFAULT: '#FAFAF8', surface: '#FFFFFF', surface2: '#F1F1EF', border: '#E4E4E0', ink: '#16171A', muted: '#6E7078' },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: { vazir: ['Vazirmatn', 'system-ui'], mono: ['"JetBrains Mono"', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        body { position: relative; background-color: #FAFAF8; }
+        html.dark body { background-color: #0F1012; }
+        body::before {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.949 0 0 0 0 0.663 0 0 0 0 0.231 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        body::after {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 55%, rgba(15,16,18,0.05) 100%);
+        }
+        html.dark body::after { background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 50%, rgba(0,0,0,0.35) 100%); }
+
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        .demo-banner {
+            background: repeating-linear-gradient(135deg, rgba(242,169,59,0.08), rgba(242,169,59,0.08) 10px, rgba(242,169,59,0.14) 10px, rgba(242,169,59,0.14) 20px);
+        }
+
+        /* ── success check circle ── */
+        .check-circle {
+            width: 96px; height: 96px;
+            border-radius: 999px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(52,211,153,0.12);
+            position: relative;
+        }
+        .check-circle::after {
+            content: "";
+            position: absolute; inset: -6px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(52,211,153,0.35);
+            animation: ring-pop 1.4s cubic-bezier(0.2,0.7,0.3,1) 0.3s forwards;
+            opacity: 0;
+        }
+        @keyframes ring-pop {
+            0% { transform: scale(0.85); opacity: 0.9; }
+            100% { transform: scale(1.25); opacity: 0; }
+        }
+        .check-icon {
+            animation: pop-in 0.45s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+        }
+        @keyframes pop-in { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .fade-up { opacity: 0; animation: fade-up 0.5s ease forwards; }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .fade-up, .check-icon, .check-circle::after { animation: none; opacity: 1; } }
+
+        .leader { border-bottom: 1px dotted; opacity: 0.55; }
+        .price-num { font-variant-numeric: tabular-nums; }
+
+        .buy-btn { transition: all 0.25s ease; }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -8px rgba(242,169,59,0.45); }
+        .buy-btn:active { transform: translateY(0); }
+
+        .copy-btn { transition: all 0.2s ease; }
+        .copy-btn:hover { color: #F2A93B; }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <div class="demo-banner border-b border-amber/30 text-center py-2.5 px-4 relative z-10">
+        <p class="text-xs sm:text-sm font-bold text-amber-deep dark:text-amber">
+            <i class="fas fa-graduation-cap ml-1"></i>
+            نسخه‌ی نمایشی پروژه‌ی دانشگاهی — این یک درگاه بانکی واقعی نیست و هیچ پرداختی انجام نشده است
+        </p>
+    </div>
+
+    <header class="py-6 relative z-10">
+        <div class="max-w-md mx-auto px-6 flex items-center justify-center gap-3">
+            <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+            <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-6 py-8 relative z-10">
+        <div class="max-w-md w-full fade-up" style="animation-delay:.05s">
+            <div class="text-center mb-8">
+                <div class="check-circle mx-auto mb-6">
+                    <i class="fas fa-check check-icon text-mint text-4xl"></i>
+                </div>
+                <p class="eyebrow text-amber mb-2 justify-center flex">تراکنش موفق</p>
+                <h2 class="text-2xl font-extrabold mb-2">پرداخت با موفقیت انجام شد</h2>
+                <p class="text-paper-muted dark:text-graphite-muted text-sm">سفارش شما ثبت شد و به‌زودی پردازش خواهد شد</p>
+            </div>
+
+            <div class="bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-2xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm text-paper-muted dark:text-graphite-muted">کد پیگیری</span>
+                    <div class="flex items-center gap-2">
+                        <span id="tracking-code" class="mono font-bold text-amber-deep dark:text-amber"></span>
+                        <button onclick="copyTracking()" class="copy-btn text-paper-muted dark:text-graphite-muted" title="کپی">
+                            <i class="fas fa-copy text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm text-paper-muted dark:text-graphite-muted">تاریخ و ساعت</span>
+                    <span id="tracking-date" class="mono text-sm font-medium"></span>
+                </div>
+                <div class="flex items-baseline gap-2 pt-4 border-t border-dashed border-paper-border dark:border-graphite-border">
+                    <span class="font-bold">مبلغ پرداخت‌شده</span>
+                    <span class="leader flex-1 border-paper-border dark:border-graphite-border"></span>
+                    <span id="tracking-amount" class="price-num mono text-xl font-extrabold text-amber-deep dark:text-amber"></span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="/" class="buy-btn flex-1 text-center bg-amber text-graphite py-3.5 rounded-lg font-bold text-sm hover:bg-amber-strong transition-all">
+                    بازگشت به فروشگاه
+                </a>
+                <button onclick="window.print()" class="flex-1 text-center border border-paper-border dark:border-graphite-border py-3.5 rounded-lg font-bold text-sm hover:border-amber hover:text-amber transition-all">
+                    چاپ فاکتور
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-6 text-center text-xs text-paper-muted dark:text-graphite-muted relative z-10">
+        © ۱۴۰۵ Smart Store — پروژه‌ی دانشجویی
+    </footer>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        function faDigits(n) {
+            const en = ['0','1','2','3','4','5','6','7','8','9'];
+            const fa = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return String(n).replace(/[0-9]/g, d => fa[en.indexOf(d)]);
+        }
+
+        function faToEnDigits(str) {
+            const faNums = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return String(str).replace(/[۰-۹]/g, d => faNums.indexOf(d));
+        }
+
+        function parsePrice(priceStr) {
+            return parseInt(faToEnDigits(priceStr).replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        // تولید کد پیگیری تصادفی (فقط نمایشی)
+        function genTrackingCode() {
+            let code = '';
+            for (let i = 0; i < 10; i++) code += Math.floor(Math.random() * 10);
+            return faDigits(code);
+        }
+
+        document.getElementById('tracking-code').textContent = genTrackingCode();
+
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('fa-IR', { dateStyle: 'medium', timeStyle: 'short' });
+        document.getElementById('tracking-date').textContent = formatter.format(now);
+
+        // محاسبه مبلغ از سبد خرید ذخیره‌شده (در صورت وجود)
+        let cart = [];
+        try { cart = JSON.parse(localStorage.getItem('cart')) || []; } catch (e) { cart = []; }
+        let total = cart.reduce((sum, item) => sum + parsePrice(item.price) * (item.quantity || 1), 0);
+        document.getElementById('tracking-amount').textContent = total.toLocaleString('fa-IR') + ' تومان';
+
+        // پاک‌کردن سبد خرید بعد از پرداخت موفق (نسخه‌ی نمایشی)
+        localStorage.removeItem('cart');
+
+        function copyTracking() {
+            const code = document.getElementById('tracking-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn i');
+                btn.className = 'fas fa-check text-xs text-mint';
+                setTimeout(() => { btn.className = 'fas fa-copy text-xs'; }, 1200);
+            });
+        }
+    </script>
+</body>
+</html>

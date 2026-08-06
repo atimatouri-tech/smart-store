@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سبد خرید - Smart Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#F5F5F3',
+                        graphite: {
+                            DEFAULT: '#0F1012',
+                            surface: '#18191D',
+                            surface2: '#202126',
+                            border: '#2C2D33',
+                            muted: '#92949C'
+                        },
+                        paper: {
+                            DEFAULT: '#FAFAF8',
+                            surface: '#FFFFFF',
+                            surface2: '#F1F1EF',
+                            border: '#E4E4E0',
+                            ink: '#16171A',
+                            muted: '#6E7078'
+                        },
+                        amber: { DEFAULT: '#F2A93B', strong: '#FFC469', deep: '#C9861A' },
+                        mint: '#34D399'
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'system-ui'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+        body { font-family: 'Vazirmatn', system-ui; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .header-icon { transition: all 0.25s ease; }
+        .header-icon:hover { transform: translateY(-2px); color: #F2A93B; }
+
+        .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .eyebrow::before { content: "/ "; color: #F2A93B; }
+
+        .ref-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.03em;
+        }
+
+        .price-num { font-variant-numeric: tabular-nums; }
+
+        .cart-item {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s ease, border-color 0.3s ease;
+        }
+        .cart-item::before {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #F2A93B, #FFC469);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+        .cart-item:hover {
+            transform: translateY(-4px);
+            border-color: #F2A93B;
+            box-shadow: 0 20px 40px -20px rgba(15,16,18,0.28);
+        }
+        .cart-item:hover::before { transform: scaleY(1); }
+        html.dark .cart-item:hover { box-shadow: 0 20px 40px -20px rgba(0,0,0,0.65); }
+
+        .item-thumb {
+            position: relative;
+            overflow: hidden;
+        }
+        .item-thumb img { transition: transform 0.5s ease; }
+        .cart-item:hover .item-thumb img { transform: scale(1.08); }
+
+        .qty-pill { transition: all 0.2s ease; }
+        .qty-btn { transition: all 0.2s ease; }
+        .qty-btn:hover { border-color: #F2A93B; color: #F2A93B; background: rgba(242,169,59,0.08); }
+        .qty-btn:active { transform: scale(0.92); }
+
+        .remove-btn { transition: all 0.2s ease; }
+        .remove-btn:hover { transform: scale(1.12) rotate(-4deg); }
+
+        .buy-btn { transition: all 0.25s ease; position: relative; overflow: hidden; }
+        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px -10px rgba(242,169,59,0.5); }
+        .buy-btn:active { transform: translateY(0); }
+        .buy-btn::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.35) 50%, transparent 80%);
+            transform: translateX(-120%);
+            transition: transform 0.6s ease;
+        }
+        .buy-btn:hover::after { transform: translateX(120%); }
+
+        .logo-mark { box-shadow: 0 0 18px -4px rgba(242,169,59,0.7); }
+
+        .leader { border-bottom: 1px dotted; opacity: 0.55; }
+
+        .summary-card {
+            transition: box-shadow 0.3s ease;
+            box-shadow: 0 24px 48px -30px rgba(15,16,18,0.18);
+        }
+        html.dark .summary-card { box-shadow: 0 24px 48px -30px rgba(0,0,0,0.6); }
+
+        .checkout-note-icon {
+            width: 28px; height: 28px;
+            flex-shrink: 0;
+        }
+
+        .empty-cart-icon {
+            width: 84px; height: 84px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 999px;
+            margin: 0 auto;
+        }
+
+        body { position: relative; background-color: #FAFAF8; }
+        html.dark body { background-color: #0F1012; }
+        body::before {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.949 0 0 0 0 0.663 0 0 0 0 0.231 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        body::after {
+            content: "";
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 55%, rgba(15,16,18,0.05) 100%);
+        }
+        html.dark body::after {
+            background: radial-gradient(ellipse 120% 90% at 50% -10%, transparent 50%, rgba(0,0,0,0.35) 100%);
+        }
+        header, main, footer { position: relative; z-index: 1; }
+
+        .fade-up { opacity: 0; animation: fade-up 0.5s ease forwards; }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; opacity: 1; } }
+
+        @keyframes float-soft {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .float-soft { animation: float-soft 3.4s ease-in-out infinite; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E4E4E0; border-radius: 999px; border: 2px solid #FAFAF8; }
+        .dark ::-webkit-scrollbar-thumb { background: #2C2D33; border: 2px solid #0F1012; }
+        ::-webkit-scrollbar-thumb:hover { background: #F2A93B; }
+        html { scrollbar-width: thin; scrollbar-color: #E4E4E0 transparent; }
+        html.dark { scrollbar-color: #2C2D33 transparent; }
+    </style>
+</head>
+<body class="bg-paper dark:bg-graphite text-paper-ink dark:text-ink min-h-screen flex flex-col">
+
+    <!-- هدر -->
+    <header class="sticky top-0 bg-paper/95 dark:bg-graphite/95 backdrop-blur-md z-50 border-b border-paper-border dark:border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="logo-mark w-9 h-9 border-[1.5px] border-amber rounded-lg flex items-center justify-center text-amber font-bold text-lg mono">S</div>
+                <h1 class="text-xl font-extrabold tracking-tight">Smart Store</h1>
+            </div>
+
+            <div class="flex-1"></div>
+
+            <div class="flex items-center gap-2 sm:gap-4 text-lg shrink-0">
+                <button onclick="toggleDarkMode()" class="header-icon p-2.5 rounded-lg hover:bg-paper-surface2 dark:hover:bg-graphite-surface2 transition-all" title="تغییر تم">
+                    <span id="theme-icon" class="text-lg">🌙</span>
+                </button>
+                <a href="/" class="header-icon p-2.5 hover:text-amber transition-all" title="بازگشت به فروشگاه">
+                    <i class="fas fa-house"></i>
+                </a>
+                <a href="/cart" class="header-icon relative p-2.5 hover:text-amber transition-all" title="سبد خرید">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-amber text-graphite text-[10px] w-5 h-5 flex items-center justify-center rounded-full text-center font-bold">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto px-6 py-14 w-full">
+        <div class="mb-10 fade-up" style="animation-delay:.02s">
+            <p class="eyebrow text-amber mb-2">سفارش</p>
+            <h1 class="text-4xl font-extrabold tracking-tight mb-4">سبد خرید شما</h1>
+            <div class="w-16 h-[3px] bg-amber rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-4" id="cart-items"></div>
+
+            <div class="relative">
+                <div class="summary-card bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-2xl p-6 h-fit sticky top-24 fade-up" style="animation-delay:.08s">
+                    <p class="eyebrow text-amber mb-2">فاکتور</p>
+                    <h3 class="text-xl font-bold mb-6">جزئیات پرداخت</h3>
+                    <div id="summary" class="space-y-4"></div>
+
+                    <button onclick="checkout()"
+                            class="buy-btn mt-8 w-full bg-amber text-graphite py-4 rounded-lg text-base font-bold hover:bg-amber-strong transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-lock text-sm"></i>
+                        تکمیل خرید و پرداخت
+                    </button>
+
+                    <div class="flex items-start gap-2.5 mt-5 pt-5 border-t border-dashed border-paper-border dark:border-graphite-border">
+                        <i class="fas fa-shield-halved checkout-note-icon text-amber text-sm mt-0.5"></i>
+                        <p class="text-xs leading-6 text-paper-muted dark:text-graphite-muted">
+                            مبلغ سفارش هنوز پرداخت نشده و در صورت اتمام موجودی، کالا از سبد حذف می‌شود.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-graphite text-ink mt-auto border-t border-graphite-border">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div>
+                    <p class="eyebrow text-amber mb-3">تماس</p>
+                    <h3 class="text-lg font-bold mb-4">تماس با ما</h3>
+                    <div class="space-y-3 text-sm text-graphite-muted">
+                        <p class="flex items-center gap-3"><i class="fas fa-phone text-amber"></i><a href="tel:09337841462" class="hover:text-amber">۰۹۳۳۷۸۴۱۴۶۲</a></p>
+                        <p class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-amber"></i><span>تهران، میرداماد، خیابان سنجابی، پلاک ۷</span></p>
+                    </div>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">شبکه‌های اجتماعی</p>
+                    <h3 class="text-lg font-bold mb-4">ما را دنبال کنید</h3>
+                    <div class="flex gap-5 text-2xl text-graphite-muted">
+                        <a href="#" class="hover:text-amber"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-amber"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <p class="eyebrow text-amber mb-3">درباره</p>
+                    <h3 class="text-lg font-bold mb-2">Smart Store</h3>
+                    <p class="text-graphite-muted text-sm">فروشگاه تخصصی لوازم هوشمند</p>
+                    <p class="mt-6 text-xs text-graphite-muted mono">© ۱۴۰۵ Smart Store — تمامی حقوق محفوظ است</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function refCode(id) {
+            return '#' + String(id ?? 0).padStart(4, '0');
+        }
+
+        function faToEnDigits(str) {
+            const faNums = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+            return String(str).replace(/[۰-۹]/g, d => faNums.indexOf(d));
+        }
+
+        function parsePrice(priceStr) {
+            return parseInt(faToEnDigits(priceStr).replace(/[^0-9]/g, ''), 10) || 0;
+        }
+
+        function updateCartCount() {
+            const countEl = document.getElementById('cart-count');
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            countEl.textContent = totalItems;
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-24 fade-up bg-paper-surface dark:bg-graphite-surface border border-dashed border-paper-border dark:border-graphite-border rounded-2xl">
+                        <div class="empty-cart-icon float-soft bg-paper-surface2 dark:bg-graphite-surface2 mb-5">
+                            <i class="fas fa-cart-shopping text-3xl text-amber"></i>
+                        </div>
+                        <p class="font-bold text-lg mb-2">سبد خرید شما خالی است</p>
+                        <p class="text-paper-muted dark:text-graphite-muted text-sm mb-7">محصولات مورد علاقه‌تان را از فروشگاه اضافه کنید</p>
+                        <a href="/" class="buy-btn inline-flex items-center gap-2 bg-amber text-graphite px-7 py-3.5 rounded-lg font-bold text-sm hover:bg-amber-strong transition-all">
+                            <i class="fas fa-arrow-left text-xs"></i>
+                            بازگشت به فروشگاه
+                        </a>
+                    </div>`;
+                updateSummary(0, 0);
+                updateCartCount();
+                return;
+            }
+
+            let total = 0;
+            let totalQty = 0;
+
+            container.innerHTML = cart.map((item, index) => {
+                const priceNum = parsePrice(item.price);
+                const qty = item.quantity || 1;
+                total += priceNum * qty;
+                totalQty += qty;
+
+                return `
+                    <div class="cart-item fade-up bg-paper-surface dark:bg-graphite-surface border border-paper-border dark:border-graphite-border rounded-xl p-5 flex gap-5" style="animation-delay:${Math.min(index * 0.05, 0.3)}s">
+                        <div class="item-thumb w-24 h-24 shrink-0 bg-paper-surface2 dark:bg-graphite-surface2 rounded-lg overflow-hidden">
+                            <img src="${item.img || ''}" class="w-full h-full object-contain p-2">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="ref-code text-paper-muted dark:text-graphite-muted mb-1.5">${refCode(item.id)}</p>
+                            <h5 class="font-bold leading-snug mb-1.5 line-clamp-2">${item.name || 'محصول'}</h5>
+                            <p class="mono text-xs text-paper-muted dark:text-graphite-muted">${item.price || '0'} تومان / عدد</p>
+                            <div class="flex items-center gap-3 mt-4">
+                                <div class="qty-pill flex items-center gap-3 border border-paper-border dark:border-graphite-border rounded-lg p-1">
+                                    <button onclick="changeQty(${index}, -1)" class="qty-btn w-7 h-7 rounded-md font-bold">−</button>
+                                    <span class="w-6 text-center font-bold mono text-sm">${qty}</span>
+                                    <button onclick="changeQty(${index}, 1)" class="qty-btn w-7 h-7 rounded-md font-bold">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col justify-between items-end shrink-0">
+                            <button onclick="removeItem(${index})" class="remove-btn text-paper-muted dark:text-graphite-muted hover:text-red-500" title="حذف">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <p class="price-num font-extrabold text-lg mono text-amber-deep dark:text-amber">${(priceNum * qty).toLocaleString('fa-IR')}</p>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            updateSummary(total, totalQty);
+            updateCartCount();
+        }
+
+        function summaryRow(label, value, big = false) {
+            return `
+                <div class="flex items-baseline gap-2 ${big ? 'pt-4 border-t border-dashed border-paper-border dark:border-graphite-border' : ''}">
+                    <span class="${big ? 'font-bold' : 'text-sm text-paper-muted dark:text-graphite-muted'}">${label}</span>
+                    <span class="leader flex-1 border-paper-border dark:border-graphite-border"></span>
+                    <span class="price-num mono ${big ? 'text-xl font-extrabold text-amber-deep dark:text-amber' : 'text-sm font-medium'}">${value}</span>
+                </div>`;
+        }
+
+        function updateSummary(total, totalQty) {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.innerHTML =
+                summaryRow('تعداد کالا', `${totalQty.toLocaleString('fa-IR')} عدد`) +
+                summaryRow('مجموع قیمت کالاها', `${total.toLocaleString('fa-IR')} تومان`) +
+                summaryRow('مجموع سبد خرید', `${total.toLocaleString('fa-IR')} تومان`, true);
+        }
+
+        function changeQty(index, change) {
+            cart[index].quantity = Math.max(1, (cart[index].quantity || 1) + change);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        function removeItem(index) {
+            if (confirm('این محصول حذف شود؟')) {
+                cart.splice(index, 1);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) return alert("سبد خرید خالی است!");
+            window.location.href = "/payment-redirect";
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        window.onload = function() {
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+            renderCart();
+        };
+    </script>
+</body>
+</html>

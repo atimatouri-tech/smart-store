@@ -1,0 +1,366 @@
+<!-- ===================== ویجت چت‌بات بامزه ===================== -->
+<style>
+  /* --- دکمه شناور ربات --- */
+  #chat-sticker{
+    position:fixed; bottom:24px; left:24px; width:66px; height:66px;
+    border-radius:50%; border:none; cursor:pointer; z-index:9999;
+    background:linear-gradient(145deg,#F2A93B,#e08f1d);
+    box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 2px 4px rgba(255,255,255,.35);
+    display:flex; align-items:center; justify-content:center;
+    animation: bot-float 2.6s ease-in-out infinite;
+    transition: transform .2s ease;
+  }
+  #chat-sticker:hover{ transform:scale(1.08) rotate(-4deg); }
+  #chat-sticker:active{ transform:scale(.94); }
+
+  @keyframes bot-float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-6px); }
+  }
+
+  /* --- شکل ربات به صورت SVG داخل دکمه --- */
+  #chat-sticker svg{ width:38px; height:38px; overflow:visible; }
+  #bot-eye-l, #bot-eye-r{ animation: bot-blink 3.2s infinite; transform-origin:center; }
+  #bot-eye-r{ animation-delay:.1s; }
+  @keyframes bot-blink{
+    0%,92%,100%{ transform:scaleY(1); }
+    95%{ transform:scaleY(.1); }
+  }
+  #bot-antenna{ animation: bot-antenna 1.8s ease-in-out infinite; transform-origin:50% 100%; }
+  @keyframes bot-antenna{
+    0%,100%{ transform:rotate(0deg); }
+    50%{ transform:rotate(10deg); }
+  }
+  #bot-antenna-tip{ animation: tip-glow 1.8s ease-in-out infinite; transform-origin:50% 100%; }
+  @keyframes tip-glow{
+    0%,100%{ fill:#ff6fa5; }
+    50%{ fill:#ffd166; }
+  }
+
+  #chat-badge{
+    position:absolute; top:-6px; right:-6px; width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+    animation: heart-beat 1s ease-in-out infinite;
+  }
+  @keyframes heart-beat{
+    0%,100%{ transform:scale(1) rotate(0deg); }
+    15%{ transform:scale(1.35) rotate(-8deg); }
+    30%{ transform:scale(1) rotate(0deg); }
+    45%{ transform:scale(1.25) rotate(8deg); }
+    60%{ transform:scale(1) rotate(0deg); }
+  }
+
+  .sparkle{
+    position:absolute; font-size:12px; opacity:0; pointer-events:none;
+    animation: sparkle-pop 2.4s ease-in-out infinite;
+  }
+  #sparkle1{ top:-8px; left:6px; animation-delay:.2s; }
+  #sparkle2{ bottom:0px; right:-10px; animation-delay:1.1s; }
+  #sparkle3{ top:14px; left:-12px; animation-delay:1.8s; }
+  @keyframes sparkle-pop{
+    0%,100%{ opacity:0; transform:scale(.4) rotate(0deg); }
+    50%{ opacity:1; transform:scale(1.1) rotate(25deg); }
+  }
+
+  #chat-box{
+    display:none; position:fixed; bottom:100px; left:24px; width:340px; max-width:90vw;
+    height:470px; background:#18191D; border:1px solid #2C2D33; border-radius:18px; z-index:9999;
+    box-shadow:0 20px 50px rgba(0,0,0,.45); flex-direction:column; overflow:hidden;
+    font-family:inherit; transform-origin:bottom left;
+    animation: box-open .28s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes box-open{
+    0%{ opacity:0; transform:scale(.85) translateY(12px); }
+    100%{ opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  #chat-header{
+    background:linear-gradient(120deg,#F2A93B,#e08f1d); color:#0F1012; padding:14px 16px;
+    font-weight:bold; display:flex; justify-content:space-between; align-items:center;
+  }
+  #chat-header .bot-name{ display:flex; align-items:center; gap:8px; }
+  #chat-header .bot-name svg{ width:24px; height:24px; }
+  #chat-close{ cursor:pointer; font-size:18px; transition:transform .2s; }
+  #chat-close:hover{ transform:rotate(90deg); }
+
+  #chat-messages{
+    flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; color:#F5F5F3;
+  }
+  .msg-bubble{
+    padding:10px 14px; border-radius:12px; font-size:14px; max-width:85%;
+    white-space:pre-wrap; animation: msg-in .25s ease forwards; opacity:0;
+  }
+  @keyframes msg-in{
+    from{ opacity:0; transform:translateY(6px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .msg-bot{ background:#202126; align-self:flex-start; }
+  .msg-user{ background:#F2A93B; color:#0F1012; align-self:flex-end; }
+
+  .typing-dots{ display:flex; gap:4px; align-items:center; }
+  .typing-dots span{
+    width:6px; height:6px; border-radius:50%; background:#F5F5F3;
+    animation: dot-bounce 1.2s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2){ animation-delay:.15s; }
+  .typing-dots span:nth-child(3){ animation-delay:.3s; }
+  @keyframes dot-bounce{
+    0%,60%,100%{ transform:translateY(0); opacity:.5; }
+    30%{ transform:translateY(-5px); opacity:1; }
+  }
+
+  #chat-input-row{ display:flex; border-top:1px solid #2C2D33; padding:10px; gap:8px; }
+  #chat-input{
+    flex:1; background:#202126; border:1px solid #2C2D33; border-radius:8px; padding:10px;
+    color:#F5F5F3; font-family:inherit; outline:none; transition:border-color .2s;
+  }
+  #chat-input:focus{ border-color:#F2A93B; }
+  #chat-send{
+    background:#F2A93B; color:#0F1012; border:none; border-radius:8px; padding:0 16px;
+    font-weight:bold; cursor:pointer; transition:transform .15s, background .2s;
+  }
+  #chat-send:hover{ background:#ffbf55; transform:scale(1.05); }
+  #chat-send:active{ transform:scale(.92); }
+
+  #chat-messages::-webkit-scrollbar{ width:6px; }
+  #chat-messages::-webkit-scrollbar-thumb{ background:#2C2D33; border-radius:6px; }
+
+  /* --- ردیف اپشن‌های سریع (بدون تایپ) --- */
+  #chat-quick-actions{
+    display:flex; gap:6px; padding:10px 12px 0 12px; flex-wrap:wrap;
+  }
+  .qa-chip{
+    background:#202126; border:1px solid #2C2D33; color:#F5F5F3;
+    font-size:12px; font-weight:600; padding:7px 12px; border-radius:999px;
+    cursor:pointer; transition:all .2s ease; white-space:nowrap;
+  }
+  .qa-chip:hover{ border-color:#F2A93B; color:#F2A93B; transform:translateY(-1px); }
+  .qa-chip.qa-active{ background:#F2A93B; color:#0F1012; border-color:#F2A93B; }
+
+  /* --- فرم مینی داخل حباب چت (مقایسه / بودجه) --- */
+  .msg-form{
+    background:#202126; align-self:stretch; border-radius:12px; padding:12px;
+    display:flex; flex-direction:column; gap:8px; animation: msg-in .25s ease forwards; opacity:0;
+    max-width:100%;
+  }
+  .msg-form label{ font-size:12px; color:#92949C; font-weight:600; }
+  .msg-form select, .msg-form input[type="number"]{
+    background:#18191D; border:1px solid #2C2D33; border-radius:8px; padding:8px 10px;
+    color:#F5F5F3; font-family:inherit; font-size:13px; outline:none;
+  }
+  .msg-form select:focus, .msg-form input:focus{ border-color:#F2A93B; }
+  .msg-form-btn{
+    background:#F2A93B; color:#0F1012; border:none; border-radius:8px; padding:9px;
+    font-weight:bold; cursor:pointer; font-size:13px; transition:transform .15s, background .2s;
+  }
+  .msg-form-btn:hover{ background:#ffbf55; }
+  .msg-form-btn:active{ transform:scale(.97); }
+  .msg-form-chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .msg-form-chip{
+    background:#18191D; border:1px solid #2C2D33; color:#F5F5F3; font-size:12px;
+    padding:6px 10px; border-radius:999px; cursor:pointer; transition:all .2s;
+  }
+  .msg-form-chip.selected{ background:rgba(242,169,59,0.18); border-color:#F2A93B; color:#F2A93B; }
+</style>
+
+<!-- دکمه شناور ربات -->
+<button id="chat-sticker" onclick="toggleChat()" aria-label="باز کردن چت">
+  <span id="chat-badge">💖</span>
+  <span class="sparkle" id="sparkle1">✨</span>
+  <span class="sparkle" id="sparkle2">⭐</span>
+  <span class="sparkle" id="sparkle3">✨</span>
+  <svg viewBox="0 0 64 64" fill="none">
+    <line id="bot-antenna" x1="32" y1="6" x2="32" y2="14" stroke="#0F1012" stroke-width="3" stroke-linecap="round"/>
+    <circle id="bot-antenna-tip" cx="32" cy="4" r="3.4" fill="#ff6fa5"/>
+    <rect x="12" y="14" width="40" height="34" rx="12" fill="#0F1012"/>
+    <rect x="17" y="19" width="30" height="22" rx="8" fill="#F2A93B"/>
+    <ellipse cx="22.5" cy="34" rx="3.4" ry="2.2" fill="#ff8fb3" opacity=".85"/>
+    <ellipse cx="41.5" cy="34" rx="3.4" ry="2.2" fill="#ff8fb3" opacity=".85"/>
+    <ellipse id="bot-eye-l" cx="26" cy="30" rx="3.2" ry="4" fill="#0F1012"/>
+    <ellipse id="bot-eye-r" cx="38" cy="30" rx="3.2" ry="4" fill="#0F1012"/>
+    <circle cx="24.9" cy="28.5" r=".9" fill="#fff"/>
+    <circle cx="36.9" cy="28.5" r=".9" fill="#fff"/>
+    <path d="M27 36 Q32 40 37 36" stroke="#0F1012" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    <rect x="6" y="27" width="6" height="12" rx="3" fill="#0F1012"/>
+    <rect x="52" y="27" width="6" height="12" rx="3" fill="#0F1012"/>
+  </svg>
+</button>
+
+<!-- پنجره چت -->
+<div id="chat-box">
+  <div id="chat-header">
+    <span class="bot-name">
+      <svg viewBox="0 0 64 64" fill="none">
+        <rect x="12" y="14" width="40" height="34" rx="12" fill="#0F1012"/>
+        <rect x="17" y="19" width="30" height="22" rx="8" fill="#F2A93B"/>
+        <ellipse cx="22.5" cy="34" rx="2.8" ry="1.8" fill="#ff8fb3" opacity=".85"/>
+        <ellipse cx="41.5" cy="34" rx="2.8" ry="1.8" fill="#ff8fb3" opacity=".85"/>
+        <ellipse cx="26" cy="30" rx="3" ry="3.6" fill="#0F1012"/>
+        <ellipse cx="38" cy="30" rx="3" ry="3.6" fill="#0F1012"/>
+        <path d="M27 36 Q32 40 37 36" stroke="#0F1012" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </svg>
+      دستیار مقایسه و بودجه
+    </span>
+    <span id="chat-close" onclick="toggleChat()">✕</span>
+  </div>
+
+  <div id="chat-quick-actions">
+    <button type="button" class="qa-chip" onclick="startCompareFlow()"><i class="fas fa-scale-balanced"></i> مقایسه دو محصول</button>
+    <button type="button" class="qa-chip" onclick="startBudgetFlow()"><i class="fas fa-wallet"></i> پیشنهاد بر اساس بودجه</button>
+    <button type="button" class="qa-chip" onclick="startFreeChat()"><i class="fas fa-comment"></i> سوال آزاد</button>
+  </div>
+
+  <div id="chat-messages">
+    <div class="msg-bubble msg-bot">
+      سلام! من دستیار مقایسه و بودجه‌ام 🤖 یکی از گزینه‌های بالا رو انتخاب کن، یا سوالت رو مستقیم بپرس 🙂
+    </div>
+  </div>
+
+  <div id="chat-input-row">
+    <input id="chat-input" type="text" placeholder="پیامت رو بنویس..."
+      onkeydown="if(event.key==='Enter') sendChatMessage()">
+    <button id="chat-send" onclick="sendChatMessage()">ارسال</button>
+  </div>
+</div>
+
+<script>
+function toggleChat(){
+  const box = document.getElementById('chat-box');
+  const badge = document.getElementById('chat-badge');
+  if(box.style.display === 'flex'){
+    box.style.animation = 'box-open .2s ease reverse forwards';
+    setTimeout(()=> box.style.display = 'none', 180);
+  } else {
+    box.style.display = 'flex';
+    box.style.animation = 'box-open .28s cubic-bezier(.34,1.56,.64,1) forwards';
+    badge.style.display = 'none';
+  }
+}
+
+function addMessage(text, isUser, isTyping){
+  const messages = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble ' + (isUser ? 'msg-user' : 'msg-bot');
+  if(isTyping){
+    bubble.classList.add('typing-bubble');
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  } else {
+    bubble.textContent = text;
+  }
+  messages.appendChild(bubble);
+  messages.scrollTop = messages.scrollHeight;
+  return bubble;
+}
+
+async function sendChatMessage(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  setActiveChip('free');
+  addMessage(text, true);
+  input.value = '';
+  sendStructuredRequest({ mode: 'chat', message: text });
+}
+
+/* ══════════════════════════════════════════════════════════
+   چت‌بات اصلی ارتقا یافته: دو قابلیت اختصاصی به‌جای فقط تایپ آزاد
+   ۱) دستیار مقایسه: دو محصول رو انتخاب کن، جدول مزایا/معایب می‌گیری
+   ۲) دستیار بودجه: بودجه‌ت رو بگو، بهترین ترکیب پیشنهاد می‌شه
+   ۳) سوال آزاد: همون چت متنی قبلی
+   ══════════════════════════════════════════════════════════ */
+
+function setActiveChip(mode){
+  const chips = document.querySelectorAll('.qa-chip');
+  chips.forEach(c => c.classList.remove('qa-active'));
+  const idx = mode === 'compare' ? 0 : mode === 'budget' ? 1 : 2;
+  if (chips[idx]) chips[idx].classList.add('qa-active');
+}
+
+function addFormMessage(html){
+  const messages = document.getElementById('chat-messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-form';
+  wrap.innerHTML = html;
+  messages.appendChild(wrap);
+  messages.scrollTop = messages.scrollHeight;
+  return wrap;
+}
+
+function sendStructuredRequest(payload){
+  const typingBubble = addMessage('', false, true);
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).then(res => res.json()).then(data => {
+    typingBubble.remove();
+    addMessage(data.reply, false);
+  }).catch(() => {
+    typingBubble.remove();
+    addMessage('یه مشکلی پیش اومد، دوباره امتحان کن.', false);
+  });
+}
+
+function startFreeChat(){
+  setActiveChip('free');
+  const input = document.getElementById('chat-input');
+  if (input) input.focus();
+}
+
+function startCompareFlow(){
+  setActiveChip('compare');
+  // products/categoryLabels از اسکریپت اصلی صفحه (index.html) در دسترس‌اند
+  const options = (typeof products !== 'undefined' ? products : []).map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  addFormMessage(`
+    <label>محصول اول</label>
+    <select id="cmp-a">${options}</select>
+    <label>محصول دوم</label>
+    <select id="cmp-b">${options}</select>
+    <button type="button" class="msg-form-btn" onclick="submitCompare()">مقایسه کن</button>
+  `);
+}
+
+function submitCompare(){
+  const a = document.getElementById('cmp-a').value;
+  const b = document.getElementById('cmp-b').value;
+  const list = typeof products !== 'undefined' ? products : [];
+  const pa = list.find(p => String(p.id) === a);
+  const pb = list.find(p => String(p.id) === b);
+  if (!pa || !pb) return;
+  if (pa.id === pb.id) {
+    addMessage('لطفاً دو محصول متفاوت انتخاب کن.', false);
+    return;
+  }
+  addMessage(`مقایسه «${pa.name}» و «${pb.name}»`, true);
+  sendStructuredRequest({ mode: 'compare', product_a_id: pa.id, product_a: pa.name, product_b_id: pb.id, product_b: pb.name });
+}
+
+function startBudgetFlow(){
+  setActiveChip('budget');
+  const cats = typeof categories !== 'undefined' ? categories : [];
+  const chipsHtml = cats.map(c => `<span class="msg-form-chip" data-key="${c.key}" onclick="this.classList.toggle('selected')">${c.name}</span>`).join('');
+  addFormMessage(`
+    <label>بودجه کل (تومان)</label>
+    <input type="number" id="budget-amount" placeholder="مثلاً ۵۰۰۰۰۰۰۰">
+    <label>دسته‌های مورد نظر (اختیاری)</label>
+    <div class="msg-form-chips">${chipsHtml}</div>
+    <button type="button" class="msg-form-btn" onclick="submitBudget(this)">پیشنهاد بده</button>
+  `);
+}
+
+function submitBudget(btn){
+  const amount = document.getElementById('budget-amount').value;
+  if (!amount) {
+    addMessage('لطفاً مقدار بودجه رو وارد کن.', false);
+    return;
+  }
+  const formWrap = btn.closest('.msg-form');
+  const selectedCats = Array.from(formWrap.querySelectorAll('.msg-form-chip.selected')).map(el => el.dataset.key);
+  const labels = typeof categoryLabels !== 'undefined' ? categoryLabels : {};
+  const catNames = selectedCats.map(k => labels[k] || k);
+  addMessage(`بودجه: ${Number(amount).toLocaleString('fa-IR')} تومان${catNames.length ? ' — دسته: ' + catNames.join('، ') : ''}`, true);
+  sendStructuredRequest({ mode: 'budget', budget: amount, categories: selectedCats });
+}
+</script>
+<!-- ===================== پایان ویجت ===================== -->
