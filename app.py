@@ -10,8 +10,10 @@ app = Flask(__name__)
 app.secret_key = 'aeriya2001'
 
 client = OpenAI(
-    api_key="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",
+  client = OpenAI(
+    api_key=os.environ.get("OPENROUTER_API_KEY"),
     base_url="https://openrouter.ai/api/v1"
+)
 )
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
